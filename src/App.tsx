@@ -1,7 +1,7 @@
-import { useState } from "react";
-import logo from "./imgs/logo.svg";
-import "./App.css";
-import { startMinting } from "./minting";
+import { useState } from 'react';
+import logo from './imgs/logo.svg';
+import './App.css';
+import { startMinting } from './minting';
 
 startMinting();
 
@@ -28,7 +28,7 @@ function App() {
           >
             Solana Web3
           </a>
-          {" | "}
+          {' | '}
           <a
             className="App-link"
             href="https://www.spl-token-ui.com/#/"
