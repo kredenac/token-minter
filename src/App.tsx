@@ -1,6 +1,9 @@
 import { useState } from "react";
 import logo from "./imgs/logo.svg";
 import "./App.css";
+import { startMinting } from "./minting";
+
+startMinting();
 
 function App() {
   const [count, setCount] = useState(0);
@@ -15,7 +18,7 @@ function App() {
             Numbers go brrr {count}
           </button>
         </p>
-        
+
         <p>
           <a
             className="App-link"
@@ -23,7 +26,7 @@ function App() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Solana Web3 
+            Solana Web3
           </a>
           {" | "}
           <a

@@ -5,7 +5,5 @@
   },
   "eslint.alwaysShowStatus": true,
   "eslint.validate": ["vue", "javascript", "javascriptreact", "html"],
-  "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
