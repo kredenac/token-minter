@@ -1,16 +1,16 @@
 module.exports = {
   root: true,
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: "module",
+    sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
     },
   },
   settings: {
     react: {
-      version: "detect",
+      version: 'detect',
     },
   },
   env: {
@@ -19,24 +19,24 @@ module.exports = {
     node: true,
   },
   extends: [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:jsx-a11y/recommended",
-    "plugin:prettier/recommended", // Make sure this is always the last element in the array.
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:jsx-a11y/recommended',
+    'plugin:prettier/recommended', // Make sure this is always the last element in the array.
   ],
-  plugins: ["prettier"],
+  plugins: ['prettier'],
   rules: {
-    "prettier/prettier": ["error", { singleQuote: true }],
-    "react/react-in-jsx-scope": "off",
-    "jsx-a11y/accessible-emoji": "off",
-    "react/prop-types": "off",
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "jsx-a11y/anchor-is-valid": [
-      "error",
+    'prettier/prettier': ['error', { singleQuote: true, endOfLine: 'auto' }],
+    'react/react-in-jsx-scope': 'off',
+    'jsx-a11y/accessible-emoji': 'off',
+    'react/prop-types': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    'jsx-a11y/anchor-is-valid': [
+      'error',
       {
-        components: ["Link"],
-        specialLink: ["hrefLeft", "hrefRight"],
-        aspects: ["invalidHref", "preferButton"],
+        components: ['Link'],
+        specialLink: ['hrefLeft', 'hrefRight'],
+        aspects: ['invalidHref', 'preferButton'],
       },
     ],
   },
