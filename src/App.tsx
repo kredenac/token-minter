@@ -48,11 +48,17 @@ function App() {
           </div>
           <div>
             <span>Owner</span>
-            <AccountFields {...state.owner} />
+            <AccountFields
+              {...state.owner}
+              decimals={state.mintInfo?.decimals}
+            />
           </div>
           <div>
             <span>Reciever</span>
-            <AccountFields {...state.reciever} />
+            <AccountFields
+              {...state.reciever}
+              decimals={state.mintInfo?.decimals}
+            />
           </div>
         </div>
 
@@ -107,12 +113,15 @@ function MintFields(props?: MintInfo) {
         value={props.mintAuthority?.toBase58()}
       />
       <Info label="Token Decimals" value={props.decimals} />
-      <Info label="Total Supply" value={props.supply.toNumber()} />
+      <Info
+        label="Total Supply"
+        value={props.supply.toNumber() / 10 ** props.decimals}
+      />
     </div>
   );
 }
 
-function AccountFields(props: IAccountState) {
+function AccountFields(props: IAccountState & { decimals?: number }) {
   if (!props) return null;
   return (
     <div>
@@ -121,7 +130,11 @@ function AccountFields(props: IAccountState) {
       <Info label="Sub-Wallet" value={props.subWalletKey} />
       <Info
         label="Sub-Wallet Balance"
-        value={props.subWalletBalance?.toString()}
+        value={
+          props.subWalletBalance
+            ? props.subWalletBalance / 10 ** (props.decimals || 0)
+            : undefined
+        }
       />
     </div>
   );
