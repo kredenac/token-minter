@@ -3,13 +3,12 @@ import logo from './imgs/logo.svg';
 import './App.css';
 import { startMinting } from './minting';
 import {
-  Account,
-  AccountState,
   AppState,
   defaultAppState,
   IAccountState,
   SetStateParam,
 } from './types';
+import { MintInfo } from '@solana/spl-token';
 
 const reducer = (state: AppState, update: SetStateParam): AppState => {
   // support both object updates and update through callback
@@ -24,7 +23,7 @@ function App() {
   const [state, setState] = useReducer(reducer, defaultAppState);
 
   useEffect(() => {
-    // startMinting(setState);
+    startMinting(setState);
   }, []);
 
   return (
@@ -39,15 +38,22 @@ function App() {
           >
             Numbers go brrr {state.count}
           </button>
+        </div>
 
-          <Info label="environment" value={state.environment} />
-          <Info label="Token Mint Key" value={state.tokenPubKey} />
-          <br />
-          <span>Owner</span>
-          <AccountFields {...state.owner} />
-          <span>Reciever</span>
-          <br />
-          <AccountFields {...state.reciever} />
+        <div className="wrapper">
+          <div>
+            <Info label="Environment" value={state.environment} />
+            <Info label="Token Mint Key" value={state.tokenPubKey} />
+            {state.mintInfo && <MintFields {...state.mintInfo} />}
+          </div>
+          <div>
+            <span>Owner</span>
+            <AccountFields {...state.owner} />
+          </div>
+          <div>
+            <span>Reciever</span>
+            <AccountFields {...state.reciever} />
+          </div>
         </div>
 
         <p>
@@ -92,6 +98,20 @@ function App() {
   );
 }
 
+function MintFields(props?: MintInfo) {
+  if (!props) return null;
+  return (
+    <div>
+      <Info
+        label="Token Mint Authority"
+        value={props.mintAuthority?.toBase58()}
+      />
+      <Info label="Token Decimals" value={props.decimals} />
+      <Info label="Total Supply" value={props.supply.toNumber()} />
+    </div>
+  );
+}
+
 function AccountFields(props: IAccountState) {
   if (!props) return null;
   return (
@@ -107,21 +127,20 @@ function AccountFields(props: IAccountState) {
   );
 }
 
-function Info(props: { label: string; value?: string }) {
+function Info(props: { label: string; value?: string | number }) {
   const { label, value } = props;
   if (!value) return null;
   return (
-    <>
-      <br />
+    <div>
       <label htmlFor={label}>{label}</label>
       <input
         type="text"
         name={label}
         value={value}
         readOnly={true}
-        size={value.length + 3}
+        // size={value.length + 3}
       />
-    </>
+    </div>
   );
 }
 

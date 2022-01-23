@@ -1,4 +1,4 @@
-import { AccountInfo } from '@solana/spl-token';
+import { AccountInfo, MintInfo } from '@solana/spl-token';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 
@@ -10,6 +10,7 @@ export type AppState = {
   environment: typeof environment;
   owner?: AccountState;
   reciever?: AccountState;
+  mintInfo?: MintInfo;
 };
 
 export interface IAccountState {
@@ -36,7 +37,8 @@ export class AccountState implements IAccountState {
   constructor(from: PublicKey | Keypair) {
     if (from instanceof Keypair) {
       this.publicKey = from.publicKey.toBase58();
-      this.privateKey = from.secretKey.toString();
+      this.privateKey = bs58.encode(from.secretKey);
+      return;
     }
     if (!(from instanceof PublicKey)) {
       throw Error('Expected argument to be PublicKey');

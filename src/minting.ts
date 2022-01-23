@@ -9,7 +9,7 @@ import { mnemonicToSeedSync } from 'bip39';
 import { createToken, mintNewCoinsOnToken } from './genesis';
 import keys from '../devnetkeys.json';
 import bs58 from 'bs58';
-import { Account, environment, SetState, TransactionPair } from './types';
+import { AccountState, environment, SetState, TransactionPair } from './types';
 
 export async function startMinting(setState: SetState) {
   const connection = new web3.Connection(
@@ -20,7 +20,10 @@ export async function startMinting(setState: SetState) {
   );
 
   const pair = getFromAndTo();
-  setState({ owner: new Account(pair.from), reciever: new Account(pair.to) });
+  setState({
+    owner: new AccountState(pair.from),
+    reciever: new AccountState(pair.to),
+  });
 
   const newTokenPub = await createToken(connection, pair);
   setState({ tokenPubKey: newTokenPub.toBase58() });

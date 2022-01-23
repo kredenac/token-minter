@@ -64,14 +64,24 @@ export async function mintNewCoinsOnToken(
 
   // fromTokenAccount.amount
 
-  setState((state) => ({ owner: state.owner!.updateFrom(fromTokenAccount) }));
+  const mintInfo = await token.getMintInfo();
+
+  setState((state) => ({
+    owner: state.owner!.updateFrom(fromTokenAccount),
+    mintInfo,
+  }));
 
   // getting or creating (if doens't exist) the token address in the toWallet address
   // toWallet is the creator: the og mintRequester
   // toTokenAmount is essentially the account *inside* the mintRequester's (creator's) wallet that will be able to handle the new token that we just minted
   // const toTokenAccount = await token.getOrCreateAssociatedAccountInfo(dest);
 
-  await token.mintTo(fromTokenAccount.address, payer, [], 10 ** 5);
+  await token.mintTo(
+    fromTokenAccount.address,
+    payer,
+    [],
+    10 ** mintInfo.decimals
+  );
 }
 
 // How to transfer custom token: https://stackoverflow.com/questions/68236211/how-to-transfer-custom-token-by-solana-web3-js
