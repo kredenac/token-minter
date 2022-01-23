@@ -1,3 +1,4 @@
+import { AccountInfo } from '@solana/spl-token';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 
@@ -5,27 +6,55 @@ export type TransactionPair = { from: Keypair; to: PublicKey };
 export const environment: 'local' | 'devnet' = 'devnet';
 export type AppState = {
   count: number;
-  tokenPubKey: string;
+  tokenPubKey?: string;
   environment: typeof environment;
-  ownerPublicKey: string;
-  ownerPrivateKey: string;
-  recieiverPublicKey: string;
-  ownerSubWallet: string;
-  recieverSubWallet: string;
+  owner?: AccountState;
+  reciever?: AccountState;
 };
+
+export interface IAccountState {
+  publicKey?: string;
+  privateKey?: string;
+  balance?: number;
+  subWalletKey?: string;
+  subWalletBalance?: number;
+}
+
+export class AccountState implements IAccountState {
+  publicKey?: string;
+  privateKey?: string;
+  balance?: number;
+  subWalletKey?: string;
+  subWalletBalance?: number;
+
+  public updateFrom(accountInfo: AccountInfo): AccountState {
+    this.subWalletBalance = accountInfo.amount.toNumber();
+    this.subWalletKey = accountInfo.address.toBase58();
+    return this;
+  }
+
+  constructor(from: PublicKey | Keypair) {
+    if (from instanceof Keypair) {
+      this.publicKey = from.publicKey.toBase58();
+      this.privateKey = from.secretKey.toString();
+    }
+    if (!(from instanceof PublicKey)) {
+      throw Error('Expected argument to be PublicKey');
+    }
+    this.publicKey = from.toBase58();
+  }
+}
 
 export const defaultAppState: AppState = {
   count: 0,
-  tokenPubKey: '',
   environment,
-  ownerPrivateKey: '',
-  ownerPublicKey: '',
-  recieiverPublicKey: '',
-  ownerSubWallet: '',
-  recieverSubWallet: '',
 };
 
-export type SetState = (state: Partial<AppState>) => void;
+export type SetStateParam =
+  | Partial<AppState>
+  | ((inState: AppState) => Partial<AppState>);
+
+export type SetState = (state: SetStateParam) => void;
 
 export function stringifySafe(obj: any, spacing: number = 2): string {
   return JSON.stringify(

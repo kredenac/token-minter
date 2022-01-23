@@ -1,12 +1,7 @@
 import * as web3 from '@solana/web3.js';
 import { PublicKey, Connection, Keypair } from '@solana/web3.js';
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-  Token,
-} from '@solana/spl-token';
+import { TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
 import { SetState, stringifySafe, TransactionPair } from './types';
-import bs58 from 'bs58';
 
 export async function airdrop(connection: Connection, to: PublicKey) {
   const airdropSignature = await connection.requestAirdrop(
@@ -67,7 +62,9 @@ export async function mintNewCoinsOnToken(
     payer.publicKey
   );
 
-  setState({ ownerSubWallet: fromTokenAccount.address.toBase58() });
+  // fromTokenAccount.amount
+
+  setState((state) => ({ owner: state.owner!.updateFrom(fromTokenAccount) }));
 
   // getting or creating (if doens't exist) the token address in the toWallet address
   // toWallet is the creator: the og mintRequester

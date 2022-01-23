@@ -2,16 +2,29 @@ import { useEffect, useReducer } from 'react';
 import logo from './imgs/logo.svg';
 import './App.css';
 import { startMinting } from './minting';
-import { AppState, defaultAppState } from './types';
+import {
+  Account,
+  AccountState,
+  AppState,
+  defaultAppState,
+  IAccountState,
+  SetStateParam,
+} from './types';
+
+const reducer = (state: AppState, update: SetStateParam): AppState => {
+  // support both object updates and update through callback
+  let newState = update;
+  if (typeof update === 'function') {
+    newState = update(state);
+  }
+  return { ...state, ...newState };
+};
 
 function App() {
-  const [state, setState] = useReducer(
-    (state: AppState, update: Partial<AppState>) => ({ ...state, ...update }),
-    defaultAppState
-  );
+  const [state, setState] = useReducer(reducer, defaultAppState);
 
   useEffect(() => {
-    startMinting(setState);
+    // startMinting(setState);
   }, []);
 
   return (
@@ -19,7 +32,7 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>Hello and happy hacking!🔥</p>
-        <p>
+        <div>
           <button
             type="button"
             onClick={() => setState({ count: state.count + 1 })}
@@ -29,12 +42,13 @@ function App() {
 
           <Info label="environment" value={state.environment} />
           <Info label="Token Mint Key" value={state.tokenPubKey} />
-          <Info label="Owner Public Key" value={state.ownerPublicKey} />
-          <Info label="Owner Private Key" value={state.ownerPrivateKey} />
-          <Info label="Reciever Public Key" value={state.recieiverPublicKey} />
-          <Info label="Owner Sub-Wallet" value={state.ownerSubWallet} />
-          <Info label="Reciever Sub-Wallet" value={state.recieverSubWallet} />
-        </p>
+          <br />
+          <span>Owner</span>
+          <AccountFields {...state.owner} />
+          <span>Reciever</span>
+          <br />
+          <AccountFields {...state.reciever} />
+        </div>
 
         <p>
           <a
@@ -74,6 +88,21 @@ function App() {
           </a>
         </p>
       </header>
+    </div>
+  );
+}
+
+function AccountFields(props: IAccountState) {
+  if (!props) return null;
+  return (
+    <div>
+      <Info label="Public Key" value={props.publicKey} />
+      <Info label="Private Key" value={props.privateKey} />
+      <Info label="Sub-Wallet" value={props.subWalletKey} />
+      <Info
+        label="Sub-Wallet Balance"
+        value={props.subWalletBalance?.toString()}
+      />
     </div>
   );
 }
