@@ -32,6 +32,8 @@ function App() {
           <Info label="Owner Public Key" value={state.ownerPublicKey} />
           <Info label="Owner Private Key" value={state.ownerPrivateKey} />
           <Info label="Reciever Public Key" value={state.recieiverPublicKey} />
+          <Info label="Owner Sub-Wallet" value={state.ownerSubWallet} />
+          <Info label="Reciever Sub-Wallet" value={state.recieverSubWallet} />
         </p>
 
         <p>

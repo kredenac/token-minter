@@ -6,14 +6,12 @@ import {
   PublicKey,
 } from '@solana/web3.js';
 import { mnemonicToSeedSync } from 'bip39';
-import { airdrop, createToken } from './genesis';
+import { createToken, mintNewCoinsOnToken } from './genesis';
 import keys from '../devnetkeys.json';
 import bs58 from 'bs58';
-import { AppState, environment, TransactionPair } from './types';
+import { environment, SetState, TransactionPair } from './types';
 
-export async function startMinting(
-  setState: (state: Partial<AppState>) => void
-) {
+export async function startMinting(setState: SetState) {
   const connection = new web3.Connection(
     environment === 'devnet'
       ? web3.clusterApiUrl('devnet')
@@ -21,15 +19,18 @@ export async function startMinting(
     'confirmed'
   );
 
-  // await getTestDataFrom(connection);
-
   const pair = getFromAndTo();
 
   const newTokenPub = await createToken(connection, pair);
-  // console.log('pubKey of new token', newTokenPub.toBase58());
   setState({ tokenPubKey: newTokenPub.toBase58() });
-  // await performTransaction(connection, pair);
-  // await airdrop(connection, pair.to);
+
+  await mintNewCoinsOnToken(
+    connection,
+    newTokenPub,
+    pair.from,
+    pair.to,
+    setState
+  );
 }
 
 function getFromAndTo(): TransactionPair {

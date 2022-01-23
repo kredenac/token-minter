@@ -1,11 +1,11 @@
 import * as web3 from '@solana/web3.js';
-import { PublicKey, Connection } from '@solana/web3.js';
+import { PublicKey, Connection, Keypair } from '@solana/web3.js';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   Token,
 } from '@solana/spl-token';
-import { stringifySafe, TransactionPair } from './types';
+import { SetState, stringifySafe, TransactionPair } from './types';
 import bs58 from 'bs58';
 
 export async function airdrop(connection: Connection, to: PublicKey) {
@@ -43,6 +43,7 @@ export async function createToken(
     5,
     TOKEN_PROGRAM_ID
   );
+
   // const fromTokenAccount = await token.getOrCreateAssociatedAccountInfo(
   //   pair.from.publicKey
   // );
@@ -51,4 +52,31 @@ export async function createToken(
   return token.publicKey;
 }
 
+export async function mintNewCoinsOnToken(
+  connection: Connection,
+  mintAddress: PublicKey,
+  payer: Keypair,
+  dest: PublicKey,
+  setState: SetState
+) {
+  const token = new Token(connection, mintAddress, TOKEN_PROGRAM_ID, payer);
+
+  // getting or creating (if doens't exist) the token address in the fromWallet address
+  // fromTokenAccount is essentially the account *inside* the fromWallet that will be able to handle the              new token that we just minted
+  const fromTokenAccount = await token.getOrCreateAssociatedAccountInfo(
+    payer.publicKey
+  );
+
+  setState({ ownerSubWallet: fromTokenAccount.address.toBase58() });
+
+  // getting or creating (if doens't exist) the token address in the toWallet address
+  // toWallet is the creator: the og mintRequester
+  // toTokenAmount is essentially the account *inside* the mintRequester's (creator's) wallet that will be able to handle the new token that we just minted
+  // const toTokenAccount = await token.getOrCreateAssociatedAccountInfo(dest);
+
+  await token.mintTo(fromTokenAccount.address, payer, [], 10 ** 5);
+}
+
 // How to transfer custom token: https://stackoverflow.com/questions/68236211/how-to-transfer-custom-token-by-solana-web3-js
+
+// Useful for minting: https://stackoverflow.com/questions/68215033/i-would-like-to-mint-a-new-token-on-solana-how-can-i-do-this-using-solana-web3

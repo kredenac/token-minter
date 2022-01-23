@@ -10,6 +10,8 @@ export type AppState = {
   ownerPublicKey: string;
   ownerPrivateKey: string;
   recieiverPublicKey: string;
+  ownerSubWallet: string;
+  recieverSubWallet: string;
 };
 
 export const defaultAppState: AppState = {
@@ -19,7 +21,11 @@ export const defaultAppState: AppState = {
   ownerPrivateKey: '',
   ownerPublicKey: '',
   recieiverPublicKey: '',
+  ownerSubWallet: '',
+  recieverSubWallet: '',
 };
+
+export type SetState = (state: Partial<AppState>) => void;
 
 export function stringifySafe(obj: any, spacing: number = 2): string {
   return JSON.stringify(
