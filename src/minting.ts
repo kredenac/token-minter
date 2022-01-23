@@ -6,34 +6,30 @@ import {
   PublicKey,
 } from '@solana/web3.js';
 import { mnemonicToSeedSync } from 'bip39';
-// import { airdrop } from './airdrop';
+import { airdrop, createToken } from './genesis';
 import keys from '../devnetkeys.json';
 import bs58 from 'bs58';
-
-const environmet: 'local' | 'devnet' = 'local';
-
-export type TransactionPair = { from: Keypair; to: PublicKey };
+import { environmet, TransactionPair } from './types';
 
 export async function startMinting() {
-  console.log(keys);
-
   const connection = new web3.Connection(
-    web3.clusterApiUrl('devnet'),
-    // 'http://localhost:8899',
+    environmet === 'devnet'
+      ? web3.clusterApiUrl('devnet')
+      : 'http://localhost:8899',
     'confirmed'
   );
 
   await getTestDataFrom(connection);
 
   const pair = getFromAndTo();
-  // if (Math.random()) return;
 
-  await performTransaction(connection, pair);
+  await createToken(connection, pair);
+  // await performTransaction(connection, pair);
   // await airdrop(connection, pair.to);
 }
 
 function getFromAndTo(): TransactionPair {
-  if (environmet === 'devnet') {
+  if (environmet === 'local') {
     const mnemonic =
       'taxi tissue you table top record require casual much acquire car another';
     const seed = mnemonicToSeedSync(mnemonic, 'lmao');
