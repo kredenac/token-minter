@@ -2,7 +2,24 @@ import { Keypair, PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 
 export type TransactionPair = { from: Keypair; to: PublicKey };
-export const environmet: 'local' | 'devnet' = 'devnet';
+export const environment: 'local' | 'devnet' = 'devnet';
+export type AppState = {
+  count: number;
+  tokenPubKey: string;
+  environment: typeof environment;
+  ownerPublicKey: string;
+  ownerPrivateKey: string;
+  recieiverPublicKey: string;
+};
+
+export const defaultAppState: AppState = {
+  count: 0,
+  tokenPubKey: '',
+  environment,
+  ownerPrivateKey: '',
+  ownerPublicKey: '',
+  recieiverPublicKey: '',
+};
 
 export function stringifySafe(obj: any, spacing: number = 2): string {
   return JSON.stringify(
@@ -24,4 +41,8 @@ export function stringifySafe(obj: any, spacing: number = 2): string {
     },
     spacing
   );
+}
+
+export function explorerLink(address: string) {
+  return `https://explorer.solana.com/address/${address}?cluster=devnet`;
 }

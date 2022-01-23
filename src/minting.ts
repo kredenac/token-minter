@@ -9,27 +9,31 @@ import { mnemonicToSeedSync } from 'bip39';
 import { airdrop, createToken } from './genesis';
 import keys from '../devnetkeys.json';
 import bs58 from 'bs58';
-import { environmet, TransactionPair } from './types';
+import { AppState, environment, TransactionPair } from './types';
 
-export async function startMinting() {
+export async function startMinting(
+  setState: (state: Partial<AppState>) => void
+) {
   const connection = new web3.Connection(
-    environmet === 'devnet'
+    environment === 'devnet'
       ? web3.clusterApiUrl('devnet')
       : 'http://localhost:8899',
     'confirmed'
   );
 
-  await getTestDataFrom(connection);
+  // await getTestDataFrom(connection);
 
   const pair = getFromAndTo();
 
-  await createToken(connection, pair);
+  const newTokenPub = await createToken(connection, pair);
+  // console.log('pubKey of new token', newTokenPub.toBase58());
+  setState({ tokenPubKey: newTokenPub.toBase58() });
   // await performTransaction(connection, pair);
   // await airdrop(connection, pair.to);
 }
 
 function getFromAndTo(): TransactionPair {
-  if (environmet === 'local') {
+  if (environment === 'local') {
     const mnemonic =
       'taxi tissue you table top record require casual much acquire car another';
     const seed = mnemonicToSeedSync(mnemonic, 'lmao');

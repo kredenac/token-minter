@@ -1,12 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import logo from './imgs/logo.svg';
 import './App.css';
 import { startMinting } from './minting';
-
-startMinting();
+import { AppState, defaultAppState } from './types';
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [state, setState] = useReducer(
+    (state: AppState, update: Partial<AppState>) => ({ ...state, ...update }),
+    defaultAppState
+  );
+
+  useEffect(() => {
+    startMinting(setState);
+  }, []);
 
   return (
     <div className="App">
@@ -14,9 +20,18 @@ function App() {
         <img src={logo} className="App-logo" alt="logo" />
         <p>Hello and happy hacking!🔥</p>
         <p>
-          <button type="button" onClick={() => setCount((count) => count + 1)}>
-            Numbers go brrr {count}
+          <button
+            type="button"
+            onClick={() => setState({ count: state.count + 1 })}
+          >
+            Numbers go brrr {state.count}
           </button>
+
+          <Info label="environment" value={state.environment} />
+          <Info label="Token Mint Key" value={state.tokenPubKey} />
+          <Info label="Owner Public Key" value={state.ownerPublicKey} />
+          <Info label="Owner Private Key" value={state.ownerPrivateKey} />
+          <Info label="Reciever Public Key" value={state.recieiverPublicKey} />
         </p>
 
         <p>
@@ -35,11 +50,47 @@ function App() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            SPL Token UI
+            SPL Token App
+          </a>
+          <br />
+          <a
+            className="App-link"
+            href="https://github.com/paul-schaaf/spl-token-ui/blob/main/src/components/tokens/TokenCreator.vue"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            SPL Token Code
+          </a>
+          {' | '}
+          <a
+            className="App-link"
+            href="https://explorer.solana.com/?cluster=devnet"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Solana explorer
           </a>
         </p>
       </header>
     </div>
+  );
+}
+
+function Info(props: { label: string; value?: string }) {
+  const { label, value } = props;
+  if (!value) return null;
+  return (
+    <>
+      <br />
+      <label htmlFor={label}>{label}</label>
+      <input
+        type="text"
+        name={label}
+        value={value}
+        readOnly={true}
+        size={value.length + 3}
+      />
+    </>
   );
 }
 
