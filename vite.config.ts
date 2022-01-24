@@ -44,6 +44,7 @@ export default defineConfig({
     zlib: 'rollup-plugin-node-polyfills/polyfills/zlib',
     tty: 'rollup-plugin-node-polyfills/polyfills/tty',
     domain: 'rollup-plugin-node-polyfills/polyfills/domain',
+    process: 'rollup-plugin-node-polyfills/polyfills/process-es6',
   },
   optimizeDeps: {
     esbuildOptions: {

@@ -1,7 +1,7 @@
 import * as web3 from '@solana/web3.js';
 import { PublicKey, Connection, Keypair } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
-import { SetState, stringifySafe, TransactionPair } from './types';
+import { SetState, TransactionPair } from './types';
 
 export async function airdrop(connection: Connection, to: PublicKey) {
   const airdropSignature = await connection.requestAirdrop(
@@ -12,24 +12,16 @@ export async function airdrop(connection: Connection, to: PublicKey) {
   console.log('result of aidrop:', airdropSignature, JSON.stringify(result));
 }
 
-const tokenMintAddr = '5MnCte1YpjDeokcruw4ooYvHM8m6fHvw2KhmF3wS4rDZ';
+const tokenMintAddr = ''; //'5MnCte1YpjDeokcruw4ooYvHM8m6fHvw2KhmF3wS4rDZ';
 export async function createToken(
   connection: Connection,
   pair: TransactionPair
-): Promise<web3.PublicKey> {
+): Promise<Token> {
   if (tokenMintAddr) {
-    return new PublicKey(tokenMintAddr);
+    // TODO find out how to create Token from only pubkey
+    // return new PublicKey(tokenMintAddr);
   }
   // todo check ASSOCIATED_TOKEN_PROGRAM_ID - determine subwallet
-  const mint = web3.Keypair.generate().publicKey;
-  console.log('mint:', mint);
-  // const token = new Token(
-  //   connection,
-  //   mint,
-  //   ASSOCIATED_TOKEN_PROGRAM_ID,
-  //   pair.from
-  // );
-
   const token = await Token.createMint(
     connection,
     pair.from,
@@ -39,12 +31,9 @@ export async function createToken(
     TOKEN_PROGRAM_ID
   );
 
-  // const fromTokenAccount = await token.getOrCreateAssociatedAccountInfo(
-  //   pair.from.publicKey
-  // );
+  console.log('created token');
 
-  console.log(stringifySafe(token));
-  return token.publicKey;
+  return token;
 }
 
 export async function mintNewCoinsOnToken(
@@ -54,6 +43,7 @@ export async function mintNewCoinsOnToken(
   dest: PublicKey,
   setState: SetState
 ) {
+  // TODO: check if it needs to be created again, or we can reuse it from before
   const token = new Token(connection, mintAddress, TOKEN_PROGRAM_ID, payer);
 
   // getting or creating (if doens't exist) the token address in the fromWallet address
@@ -61,10 +51,12 @@ export async function mintNewCoinsOnToken(
   const fromTokenAccount = await token.getOrCreateAssociatedAccountInfo(
     payer.publicKey
   );
+  console.log('got associated account');
 
   // fromTokenAccount.amount
 
   const mintInfo = await token.getMintInfo();
+  console.log('got mint info');
 
   setState((state) => ({
     owner: state.owner!.updateFrom(fromTokenAccount),
@@ -80,8 +72,28 @@ export async function mintNewCoinsOnToken(
     fromTokenAccount.address,
     payer,
     [],
-    10 ** mintInfo.decimals
+    37 * 10 ** mintInfo.decimals
   );
+
+  console.log('minted coins');
+}
+
+export async function updateMintAndAccountInfo(
+  setState: SetState,
+  token: Token,
+  accToUpdate: PublicKey
+) {
+  const mintInfoAFter = await token.getMintInfo();
+  console.log('Updated mint info');
+  setState({ mintInfo: mintInfoAFter });
+
+  const fromTokenAccount = await token.getOrCreateAssociatedAccountInfo(
+    accToUpdate
+  );
+  setState((state) => ({
+    owner: state.owner!.updateFrom(fromTokenAccount),
+  }));
+  console.log('Updated account info');
 }
 
 // How to transfer custom token: https://stackoverflow.com/questions/68236211/how-to-transfer-custom-token-by-solana-web3-js

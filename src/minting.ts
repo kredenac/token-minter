@@ -1,12 +1,11 @@
 import * as web3 from '@solana/web3.js';
-import {
-  sendAndConfirmTransaction,
-  Keypair,
-  Connection,
-  PublicKey,
-} from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import { mnemonicToSeedSync } from 'bip39';
-import { createToken, mintNewCoinsOnToken } from './genesis';
+import {
+  createToken,
+  mintNewCoinsOnToken,
+  updateMintAndAccountInfo,
+} from './genesis';
 import keys from '../devnetkeys.json';
 import bs58 from 'bs58';
 import { AccountState, environment, SetState, TransactionPair } from './types';
@@ -25,16 +24,18 @@ export async function startMinting(setState: SetState) {
     reciever: new AccountState(pair.to),
   });
 
-  const newTokenPub = await createToken(connection, pair);
-  setState({ tokenPubKey: newTokenPub.toBase58() });
+  const newToken = await createToken(connection, pair);
+  setState({ tokenPubKey: newToken.publicKey.toBase58() });
 
   await mintNewCoinsOnToken(
     connection,
-    newTokenPub,
+    newToken.publicKey,
     pair.from,
     pair.to,
     setState
   );
+
+  await updateMintAndAccountInfo(setState, newToken, pair.from.publicKey);
 }
 
 function getFromAndTo(): TransactionPair {
@@ -55,34 +56,4 @@ function getFromAndTo(): TransactionPair {
     from: Keypair.fromSecretKey(decoded),
     to: new PublicKey(keys.to),
   };
-}
-
-async function getTestDataFrom(connection: Connection) {
-  let slot = await connection.getSlot();
-  console.log(slot);
-
-  let blockTime = await connection.getBlockTime(slot);
-  console.log(blockTime);
-}
-
-async function performTransaction(
-  connection: Connection,
-  pair: TransactionPair
-) {
-  const { from, to } = pair;
-  const tx = new web3.Transaction({ feePayer: from.publicKey });
-  tx.add(
-    web3.SystemProgram.transfer({
-      fromPubkey: from.publicKey,
-      toPubkey: to,
-      lamports: web3.LAMPORTS_PER_SOL,
-    })
-  );
-
-  const result = await sendAndConfirmTransaction(connection, tx, [from]);
-
-  console.log('result', result);
-  const account = await connection.getAccountInfo(to);
-
-  console.log('your account info', JSON.stringify(account, null, 2));
 }
