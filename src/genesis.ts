@@ -1,7 +1,7 @@
 import * as web3 from '@solana/web3.js';
 import { PublicKey, Connection, Keypair } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
-import { SetState, TransactionPair } from './types';
+import { AppState, SetState, TransactionPair } from './types';
 
 export async function airdrop(connection: Connection, to: PublicKey) {
   const airdropSignature = await connection.requestAirdrop(
@@ -31,8 +31,6 @@ export async function createToken(
     TOKEN_PROGRAM_ID
   );
 
-  console.log('created token');
-
   return token;
 }
 
@@ -52,6 +50,7 @@ export async function mintNewCoinsOnToken(
     payer.publicKey
   );
   console.log('got associated account');
+  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 
   // fromTokenAccount.amount
 
@@ -61,6 +60,7 @@ export async function mintNewCoinsOnToken(
   setState((state) => ({
     owner: state.owner!.updateFrom(fromTokenAccount),
     mintInfo,
+    currentSteps: state.currentSteps + 1,
   }));
 
   // getting or creating (if doens't exist) the token address in the toWallet address
@@ -76,6 +76,7 @@ export async function mintNewCoinsOnToken(
   );
 
   console.log('minted coins');
+  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 }
 
 export async function updateMintAndAccountInfo(
@@ -86,6 +87,7 @@ export async function updateMintAndAccountInfo(
   const mintInfoAFter = await token.getMintInfo();
   console.log('Updated mint info');
   setState({ mintInfo: mintInfoAFter });
+  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 
   const fromTokenAccount = await token.getOrCreateAssociatedAccountInfo(
     accToUpdate
@@ -93,6 +95,7 @@ export async function updateMintAndAccountInfo(
   setState((state) => ({
     owner: state.owner!.updateFrom(fromTokenAccount),
   }));
+  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
   console.log('Updated account info');
 }
 

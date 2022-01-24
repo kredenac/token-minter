@@ -11,6 +11,8 @@ export type AppState = {
   owner?: AccountState;
   reciever?: AccountState;
   mintInfo?: MintInfo;
+  totalSteps: number;
+  currentSteps: number;
 };
 
 export interface IAccountState {
@@ -50,6 +52,8 @@ export class AccountState implements IAccountState {
 export const defaultAppState: AppState = {
   count: 0,
   environment,
+  currentSteps: 0,
+  totalSteps: 6,
 };
 
 export type SetStateParam =

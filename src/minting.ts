@@ -8,7 +8,13 @@ import {
 } from './genesis';
 import keys from '../devnetkeys.json';
 import bs58 from 'bs58';
-import { AccountState, environment, SetState, TransactionPair } from './types';
+import {
+  AccountState,
+  AppState,
+  environment,
+  SetState,
+  TransactionPair,
+} from './types';
 
 export async function startMinting(setState: SetState) {
   const connection = new web3.Connection(
@@ -24,8 +30,10 @@ export async function startMinting(setState: SetState) {
     reciever: new AccountState(pair.to),
   });
 
+  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
   const newToken = await createToken(connection, pair);
   setState({ tokenPubKey: newToken.publicKey.toBase58() });
+  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 
   await mintNewCoinsOnToken(
     connection,

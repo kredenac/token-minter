@@ -27,10 +27,13 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <StepProgressBar />
         <img src={logo} className="App-logo" alt="logo" />
         <p>Hello and happy hacking!🔥</p>
         <div>
+          <StepProgressBar
+            currentStep={state.currentSteps}
+            totalSteps={state.totalSteps}
+          />
           <button type="button" onClick={() => startMinting(setState)}>
             Start minting!
           </button>

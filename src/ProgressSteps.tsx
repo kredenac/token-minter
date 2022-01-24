@@ -1,8 +1,20 @@
 import React from 'react';
-// import 'react-step-progress-bar/styles.css';
+import 'react-stepi-bar/styles.css';
+import { ProgressBar } from 'react-stepi-bar';
 
-export class StepProgressBar extends React.Component {
+interface IProgressBarProps {
+  currentStep: number;
+  totalSteps: number;
+}
+export class StepProgressBar extends React.Component<IProgressBarProps> {
   render() {
-    return null;
+    const { currentStep, totalSteps } = this.props;
+    const percent = (currentStep * 100) / totalSteps;
+    return (
+      <ProgressBar
+        percent={percent}
+        filledBackground="linear-gradient(to right, #fefb72, #f0bb31)"
+      />
+    );
   }
 }
