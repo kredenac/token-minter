@@ -15,8 +15,13 @@ import {
   SetState,
   TransactionPair,
 } from './types';
+import { connectWalletAdapter } from './walletAdapter';
 
 export async function startMinting(setState: SetState) {
+  if (connectWalletAdapter()) {
+    return;
+  }
+
   const connection = new web3.Connection(
     environment === 'devnet'
       ? web3.clusterApiUrl('devnet')
@@ -24,6 +29,7 @@ export async function startMinting(setState: SetState) {
     'confirmed'
   );
 
+  setState({ currentSteps: 0 });
   const pair = getFromAndTo();
   setState({
     owner: new AccountState(pair.from),

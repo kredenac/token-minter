@@ -45,28 +45,19 @@ export async function mintNewCoinsOnToken(
   const token = new Token(connection, mintAddress, TOKEN_PROGRAM_ID, payer);
 
   // getting or creating (if doens't exist) the token address in the fromWallet address
-  // fromTokenAccount is essentially the account *inside* the fromWallet that will be able to handle the              new token that we just minted
+  // fromTokenAccount is essentially the account *inside* the fromWallet for the new token
   const fromTokenAccount = await token.getOrCreateAssociatedAccountInfo(
     payer.publicKey
   );
-  console.log('got associated account');
   setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 
-  // fromTokenAccount.amount
-
   const mintInfo = await token.getMintInfo();
-  console.log('got mint info');
 
   setState((state) => ({
     owner: state.owner!.updateFrom(fromTokenAccount),
     mintInfo,
     currentSteps: state.currentSteps + 1,
   }));
-
-  // getting or creating (if doens't exist) the token address in the toWallet address
-  // toWallet is the creator: the og mintRequester
-  // toTokenAmount is essentially the account *inside* the mintRequester's (creator's) wallet that will be able to handle the new token that we just minted
-  // const toTokenAccount = await token.getOrCreateAssociatedAccountInfo(dest);
 
   await token.mintTo(
     fromTokenAccount.address,

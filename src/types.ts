@@ -53,7 +53,7 @@ export const defaultAppState: AppState = {
   count: 0,
   environment,
   currentSteps: 0,
-  totalSteps: 6,
+  totalSteps: 7,
 };
 
 export type SetStateParam =
