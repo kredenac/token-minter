@@ -1,11 +1,76 @@
 import * as web3 from '@solana/web3.js';
-import { PublicKey, Connection, Keypair, Transaction } from '@solana/web3.js';
+import {
+  PublicKey,
+  Connection,
+  Keypair,
+  Transaction,
+  SystemProgram,
+} from '@solana/web3.js';
 import {
   TOKEN_PROGRAM_ID,
   Token,
   ASSOCIATED_TOKEN_PROGRAM_ID,
+  MintLayout,
 } from '@solana/spl-token';
 import { AppState, SetState, stringifySafe, TransactionPair } from './types';
+import { useConnection } from '@solana/wallet-adapter-react';
+
+export async function createMintingTransaction(args: {
+  publicKey: PublicKey;
+  connection: Connection;
+}): Promise<{
+  transaction: Transaction;
+  associatedAddress: PublicKey;
+  mintKeypair: Keypair;
+}> {
+  const mintKeypair = Keypair.generate();
+  const { publicKey } = args;
+
+  const associatedAddress = await Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    mintKeypair.publicKey,
+    publicKey
+  );
+  const rent = await args.connection.getMinimumBalanceForRentExemption(
+    MintLayout.span
+  );
+
+  const transaction = new Transaction().add(
+    SystemProgram.createAccount({
+      fromPubkey: publicKey,
+      newAccountPubkey: mintKeypair.publicKey,
+      space: MintLayout.span,
+      lamports: rent,
+      programId: TOKEN_PROGRAM_ID,
+    }),
+    Token.createInitMintInstruction(
+      TOKEN_PROGRAM_ID,
+      mintKeypair.publicKey,
+      5,
+      publicKey,
+      null
+    ),
+    Token.createAssociatedTokenAccountInstruction(
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      mintKeypair.publicKey,
+      associatedAddress,
+      publicKey,
+      publicKey
+    ),
+    Token.createMintToInstruction(
+      TOKEN_PROGRAM_ID,
+      mintKeypair.publicKey,
+      associatedAddress,
+      publicKey,
+      [],
+      17
+    )
+  );
+
+  return { transaction, mintKeypair, associatedAddress };
+}
 
 export async function airdrop(connection: Connection, to: PublicKey) {
   const airdropSignature = await connection.requestAirdrop(
@@ -16,35 +81,12 @@ export async function airdrop(connection: Connection, to: PublicKey) {
   console.log('result of aidrop:', airdropSignature, JSON.stringify(result));
 }
 
-const tokenMintAddr = ''; //'5MnCte1YpjDeokcruw4ooYvHM8m6fHvw2KhmF3wS4rDZ';
 export async function createToken(
   connection: Connection,
   pair: TransactionPair
 ): Promise<Token> {
-  if (tokenMintAddr) {
-    // TODO find out how to create Token from only pubkey
-    // return new PublicKey(tokenMintAddr);
-  }
   const mintPublicKey = Keypair.generate().publicKey;
   console.log('mint pkey:', mintPublicKey.toBase58());
-
-  // const transaction = new Transaction().add(
-  //   Token.createInitMintInstruction(
-  //     TOKEN_PROGRAM_ID,
-  //     mintPublicKey, //publicKey, //mintPublicKey,
-  //     3,
-  //     pair.from.publicKey,
-  //     pair.from.publicKey
-  //   )
-  // );
-
-  // sta mu fali ovde pa da kaze "invalid accouint data for instruction"
-  // const result = await connection.sendTransaction(transaction, [pair.from]);
-  // console.log(result);
-
-  // if (Math.random()) return result as any;
-
-  // todo check ASSOCIATED_TOKEN_PROGRAM_ID - determine subwallet
 
   const token = await Token.createMint(
     connection,
@@ -52,11 +94,8 @@ export async function createToken(
     pair.from.publicKey,
     null,
     5,
-    TOKEN_PROGRAM_ID // TODO what's the diff?
+    TOKEN_PROGRAM_ID
   );
-
-  // TODO create instruction then send it to wallet for signing
-  // Token.createMintToInstruction()
 
   console.log(stringifySafe(token));
 

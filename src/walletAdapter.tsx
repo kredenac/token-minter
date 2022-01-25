@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   ConnectionProvider,
   WalletProvider,
@@ -21,7 +21,6 @@ import {
 import {
   clusterApiUrl,
   Keypair,
-  PublicKey,
   SystemProgram,
   Transaction,
 } from '@solana/web3.js';
@@ -61,18 +60,12 @@ export const Wallet = () => {
 
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  MintLayout,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token';
+import { createMintingTransaction } from './genesis';
 
-const existingTokenMint = new PublicKey(
-  '8nbcuhuwXyVapFN559XPbTisJFMU6vfTvYLnj9v4x1xV'
-);
 export const ExecutePayment = () => {
   const { publicKey, sendTransaction, signTransaction } = useWallet();
+  const [assocAddr, setAssocAddr] = useState('');
+  const [mintAddr, setMintAddr] = useState('');
 
   const { connection } = useConnection();
   const onClick = useCallback(async () => {
@@ -80,68 +73,27 @@ export const ExecutePayment = () => {
     if (!signTransaction)
       throw new WalletNotConnectedError('no sign transaction');
 
-    const mintKeypair = Keypair.generate();
-
-    const rent = await connection.getMinimumBalanceForRentExemption(
-      MintLayout.span
-    );
-
-    const associatedAddress = await Token.getAssociatedTokenAddress(
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      mintKeypair.publicKey,
-      publicKey
-    );
-
-    console.log('associated address,', associatedAddress.toBase58());
-
-    const transaction = new Transaction().add(
-      SystemProgram.createAccount({
-        fromPubkey: publicKey,
-        newAccountPubkey: mintKeypair.publicKey,
-        space: MintLayout.span,
-        lamports: rent,
-        programId: TOKEN_PROGRAM_ID,
-      }),
-      Token.createInitMintInstruction(
-        TOKEN_PROGRAM_ID,
-        mintKeypair.publicKey,
-        5,
-        publicKey,
-        null
-      ),
-      Token.createAssociatedTokenAccountInstruction(
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        mintKeypair.publicKey,
-        associatedAddress,
-        publicKey,
-        publicKey
-      ),
-      // create minttoinstruction
-      Token.createMintToInstruction(
-        TOKEN_PROGRAM_ID,
-        mintKeypair.publicKey,
-        associatedAddress,
-        publicKey,
-        [],
-        17
-      )
-    );
+    const { transaction, associatedAddress, mintKeypair } =
+      await createMintingTransaction({ publicKey, connection });
 
     const signature = await sendTransaction(transaction, connection, {
-      signers: [mintKeypair], // ovo me jebalo
+      signers: [mintKeypair],
     });
 
     await connection.confirmTransaction(signature, 'processed');
 
-    console.log('new mint:', mintKeypair.publicKey.toBase58());
+    setAssocAddr(associatedAddress.toBase58());
+    setMintAddr(mintKeypair.publicKey.toBase58());
   }, [publicKey, sendTransaction, connection]);
 
   return (
-    <button onClick={onClick} disabled={!publicKey}>
-      Just do it
-    </button>
+    <div>
+      <button onClick={onClick} disabled={!publicKey}>
+        Just do it
+      </button>
+      {assocAddr && <p>Assocciated Wallet Address {assocAddr}</p>}
+      {assocAddr && <p>Your New Token Address {mintAddr}</p>}
+    </div>
   );
 };
 
