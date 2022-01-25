@@ -28,20 +28,21 @@ export async function createToken(
   const mintPublicKey = Keypair.generate().publicKey;
   console.log('mint pkey:', mintPublicKey.toBase58());
 
-  const transaction = new Transaction().add(
-    Token.createInitMintInstruction(
-      TOKEN_PROGRAM_ID,
-      mintPublicKey, //publicKey, //mintPublicKey,
-      3,
-      pair.from.publicKey,
-      pair.from.publicKey
-    )
-  );
+  // const transaction = new Transaction().add(
+  //   Token.createInitMintInstruction(
+  //     TOKEN_PROGRAM_ID,
+  //     mintPublicKey, //publicKey, //mintPublicKey,
+  //     3,
+  //     pair.from.publicKey,
+  //     pair.from.publicKey
+  //   )
+  // );
 
-  const result = await connection.sendTransaction(transaction, [pair.from]);
-  console.log(result);
+  // sta mu fali ovde pa da kaze "invalid accouint data for instruction"
+  // const result = await connection.sendTransaction(transaction, [pair.from]);
+  // console.log(result);
 
-  if (Math.random()) return result as any;
+  // if (Math.random()) return result as any;
 
   // todo check ASSOCIATED_TOKEN_PROGRAM_ID - determine subwallet
 

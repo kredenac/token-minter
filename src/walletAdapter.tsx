@@ -31,7 +31,7 @@ import {
 import '@solana/wallet-adapter-react-ui/styles.css';
 
 export const Wallet = () => {
-  const network = WalletAdapterNetwork.Devnet;
+  const network = WalletAdapterNetwork.Testnet;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
   const wallets = useMemo(
@@ -70,6 +70,7 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
+import { getFromAndTo } from './minting';
 
 const existingTokenMint = new PublicKey(
   '8nbcuhuwXyVapFN559XPbTisJFMU6vfTvYLnj9v4x1xV'
@@ -96,28 +97,43 @@ export const ExecutePayment = () => {
     //   })
     // );
 
-    const mintPublicKey = Keypair.generate().publicKey;
+    const mintKeypair = Keypair.generate();
+    const mintPublicKey = mintKeypair.publicKey;
     console.log('mint pkey:', mintPublicKey.toBase58());
 
-    // const rent = await connection.getMinimumBalanceForRentExemption(
-    //   MintLayout.span
+    const rent = await connection.getMinimumBalanceForRentExemption(
+      MintLayout.span
+    );
+    console.log('rent:', rent);
+
+    const keypair = getFromAndTo();
+
+    // const token = await Token.createMint(
+    //   connection,
+    //   keypair.from,
+    //   keypair.from.publicKey,
+    //   null,
+    //   5,
+    //   TOKEN_PROGRAM_ID // TODO what's the diff?
     // );
+    // console.log('token succeeded');
+    // if (Math.random()) return;
 
     const transaction = new Transaction().add(
-      //   SystemProgram.createAccount({
-      //     fromPubkey: publicKey,
-      //     newAccountPubkey: mintPublicKey,
-      //     space: MintLayout.span,
-      //     lamports: rent,
-      //     programId: TOKEN_PROGRAM_ID,
-      //   })
-      Token.createInitMintInstruction(
-        TOKEN_PROGRAM_ID,
-        mintPublicKey, //publicKey, //mintPublicKey,
-        5,
-        publicKey,
-        publicKey
-      )
+      SystemProgram.createAccount({
+        fromPubkey: publicKey,
+        newAccountPubkey: mintPublicKey,
+        space: MintLayout.span,
+        lamports: rent,
+        programId: TOKEN_PROGRAM_ID,
+      })
+      //   Token.createInitMintInstruction(
+      //     TOKEN_PROGRAM_ID,
+      //     mintPublicKey, //publicKey, //mintPublicKey,
+      //     5,
+      //     publicKey,
+      //     publicKey
+      //   )
       // Token.createAssociatedTokenAccountInstruction(
       //     ASSOCIATED_TOKEN_PROGRAM_ID,
       //     TOKEN_PROGRAM_ID,
@@ -137,7 +153,14 @@ export const ExecutePayment = () => {
     // const { signature } = await solana.signAndSendTransaction(transaction);
     // === manual window test start
 
-    // const signature = await sendTransaction(transaction, connection);
+    // transaction.recentBlockhash = (
+    //   await connection.getRecentBlockhash()
+    // ).blockhash;
+    // transaction.feePayer = publicKey;
+
+    const signature = await sendTransaction(transaction, connection, {
+      signers: [mintKeypair],
+    });
     console.log('after signature');
 
     await connection.confirmTransaction(signature, 'processed');

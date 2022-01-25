@@ -53,7 +53,7 @@ export async function startMinting(setState: SetState) {
   await updateMintAndAccountInfo(setState, newToken, pair.from.publicKey);
 }
 
-function getFromAndTo(): TransactionPair {
+export function getFromAndTo(): TransactionPair {
   if (environment === 'local') {
     const mnemonic =
       'taxi tissue you table top record require casual much acquire car another';
