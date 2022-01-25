@@ -1,7 +1,11 @@
 import * as web3 from '@solana/web3.js';
-import { PublicKey, Connection, Keypair } from '@solana/web3.js';
-import { TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
-import { AppState, SetState, TransactionPair } from './types';
+import { PublicKey, Connection, Keypair, Transaction } from '@solana/web3.js';
+import {
+  TOKEN_PROGRAM_ID,
+  Token,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+} from '@solana/spl-token';
+import { AppState, SetState, stringifySafe, TransactionPair } from './types';
 
 export async function airdrop(connection: Connection, to: PublicKey) {
   const airdropSignature = await connection.requestAirdrop(
@@ -21,15 +25,39 @@ export async function createToken(
     // TODO find out how to create Token from only pubkey
     // return new PublicKey(tokenMintAddr);
   }
+  const mintPublicKey = Keypair.generate().publicKey;
+  console.log('mint pkey:', mintPublicKey.toBase58());
+
+  const transaction = new Transaction().add(
+    Token.createInitMintInstruction(
+      TOKEN_PROGRAM_ID,
+      mintPublicKey, //publicKey, //mintPublicKey,
+      3,
+      pair.from.publicKey,
+      pair.from.publicKey
+    )
+  );
+
+  const result = await connection.sendTransaction(transaction, [pair.from]);
+  console.log(result);
+
+  if (Math.random()) return result as any;
+
   // todo check ASSOCIATED_TOKEN_PROGRAM_ID - determine subwallet
+
   const token = await Token.createMint(
     connection,
     pair.from,
     pair.from.publicKey,
     null,
     5,
-    TOKEN_PROGRAM_ID
+    TOKEN_PROGRAM_ID // TODO what's the diff?
   );
+
+  // TODO create instruction then send it to wallet for signing
+  // Token.createMintToInstruction()
+
+  console.log(stringifySafe(token));
 
   return token;
 }
@@ -49,6 +77,7 @@ export async function mintNewCoinsOnToken(
   const fromTokenAccount = await token.getOrCreateAssociatedAccountInfo(
     payer.publicKey
   );
+
   setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 
   const mintInfo = await token.getMintInfo();
@@ -61,7 +90,7 @@ export async function mintNewCoinsOnToken(
 
   await token.mintTo(
     fromTokenAccount.address,
-    payer,
+    payer.publicKey,
     [],
     37 * 10 ** mintInfo.decimals
   );
@@ -89,6 +118,8 @@ export async function updateMintAndAccountInfo(
   setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
   console.log('Updated account info');
 }
+
+// mint with wallet https://codesandbox.io/s/bc0ly?file=/src/candy-machine.ts
 
 // How to transfer custom token: https://stackoverflow.com/questions/68236211/how-to-transfer-custom-token-by-solana-web3-js
 

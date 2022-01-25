@@ -11,6 +11,7 @@ import {
 } from './types';
 import { MintInfo } from '@solana/spl-token';
 import { StepProgressBar } from './ProgressSteps';
+import { Wallet } from './walletAdapter';
 
 const reducer = (state: AppState, update: SetStateParam): AppState => {
   // support both object updates and update through callback
@@ -27,6 +28,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <Wallet></Wallet>
         <img src={logo} className="App-logo" alt="logo" />
         <p>Hello and happy hacking!🔥</p>
         <div>
@@ -42,7 +44,7 @@ function App() {
         <div className="wrapper">
           <div>
             <Info label="Environment" value={state.environment} />
-            <Info label="Token Mint Key" value={state.tokenPubKey} />
+            <Info label="Token Mint Key" value={state.tokenPubKey} isLink />
             {state.mintInfo && <MintFields {...state.mintInfo} />}
           </div>
           <div>

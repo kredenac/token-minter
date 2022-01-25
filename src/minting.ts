@@ -18,9 +18,9 @@ import {
 import { connectWalletAdapter } from './walletAdapter';
 
 export async function startMinting(setState: SetState) {
-  if (connectWalletAdapter()) {
-    return;
-  }
+  // if (connectWalletAdapter()) {
+  //   return;
+  // }
 
   const connection = new web3.Connection(
     environment === 'devnet'
@@ -39,6 +39,7 @@ export async function startMinting(setState: SetState) {
   setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
   const newToken = await createToken(connection, pair);
   setState({ tokenPubKey: newToken.publicKey.toBase58() });
+  if (Math.random()) return;
   setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 
   await mintNewCoinsOnToken(
