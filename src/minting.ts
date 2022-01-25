@@ -39,7 +39,7 @@ export async function startMinting(setState: SetState) {
   setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
   const newToken = await createToken(connection, pair);
   setState({ tokenPubKey: newToken.publicKey.toBase58() });
-  if (Math.random()) return;
+  // if (Math.random()) return;
   setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 
   await mintNewCoinsOnToken(
