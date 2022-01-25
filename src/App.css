@@ -3,18 +3,38 @@
 }
 
 .App-logo {
-  height: 25vmin;
+  height: 10vmin;
   pointer-events: none;
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+body {
+  font-family: "DM Sans", "Roboto", "Helvetica Neue", Helvetica, Arial,
+    sans-serif;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+    /* animation: App-logo-spin infinite 2s cubic-bezier(.75,-0.01,.25,.98); */
   }
 }
 
+p {
+  font-size: large;
+  opacity: 0.5;
+}
+
+.just-do-it {
+  background-color: #062 !important;
+}
+
+.just-do-it:hover {
+  background-color: rgb(14, 153, 60) !important; 
+}
+
 .App-header {
-  background-color: #282c34;
+  background-color: #1a1d24;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -32,8 +52,11 @@
   from {
     transform: rotate(0deg);
   }
+  50% {
+    transform: rotate(80deg);
+  }
   to {
-    transform: rotate(360deg);
+    transform: rotate(0deg);
   }
 }
 

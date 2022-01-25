@@ -15,7 +15,6 @@ import {
   SetState,
   TransactionPair,
 } from './types';
-import { connectWalletAdapter } from './walletAdapter';
 
 export async function startMinting(setState: SetState) {
   // if (connectWalletAdapter()) {

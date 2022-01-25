@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   ConnectionProvider,
   WalletProvider,
@@ -18,16 +18,11 @@ import {
   WalletDisconnectButton,
   WalletMultiButton,
 } from '@solana/wallet-adapter-react-ui';
-import {
-  clusterApiUrl,
-  Keypair,
-  SystemProgram,
-  Transaction,
-} from '@solana/web3.js';
+import { clusterApiUrl } from '@solana/web3.js';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 
-export const Wallet = () => {
+export const Wallet = (props: { children: React.ReactNode }) => {
   const network = WalletAdapterNetwork.Devnet;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
@@ -48,9 +43,11 @@ export const Wallet = () => {
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
-          <WalletMultiButton />
+          <div style={{ marginBottom: '10px' }}>
+            <WalletMultiButton />
+          </div>
           <WalletDisconnectButton />
-          {/* Your app's components go here, nested within the context providers. */}
+          {props.children}
           <ExecutePayment />
         </WalletModalProvider>
       </WalletProvider>
@@ -86,10 +83,17 @@ export const ExecutePayment = () => {
     setMintAddr(mintKeypair.publicKey.toBase58());
   }, [publicKey, sendTransaction, connection]);
 
+  console.log(publicKey);
   return (
-    <div>
-      <button onClick={onClick} disabled={!publicKey}>
-        Just do it
+    <div style={{ marginTop: '10px' }}>
+      <button
+        onClick={onClick}
+        disabled={!publicKey}
+        className={(publicKey ? 'just-do-it' : '') + ' wallet-adapter-button'}
+      >
+        {publicKey
+          ? 'Create your new Token!'
+          : 'Connect wallet to create new Token'}
       </button>
       {assocAddr && <p>Assocciated Wallet Address {assocAddr}</p>}
       {assocAddr && <p>Your New Token Address {mintAddr}</p>}

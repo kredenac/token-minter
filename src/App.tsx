@@ -1,5 +1,5 @@
 import { useReducer } from 'react';
-import logo from './imgs/logo.svg';
+import logo from './imgs/solana-sol-logo.svg';
 import './App.css';
 import { startMinting } from './minting';
 import {
@@ -28,78 +28,18 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Wallet></Wallet>
+        <Wallet>{/* <span> hi</span> */}</Wallet>
         <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello and happy hacking!🔥</p>
+        <p>🚀StreamFlow Token Minter🚀</p>
         <div>
           <StepProgressBar
             currentStep={state.currentSteps}
             totalSteps={state.totalSteps}
           />
-          <button type="button" onClick={() => startMinting(setState)}>
+          {/* <button type="button" onClick={() => startMinting(setState)}>
             Start minting!
-          </button>
+          </button> */}
         </div>
-
-        <div className="wrapper">
-          <div>
-            <Info label="Environment" value={state.environment} />
-            <Info label="Token Mint Key" value={state.tokenPubKey} isLink />
-            {state.mintInfo && <MintFields {...state.mintInfo} />}
-          </div>
-          <div>
-            <span>Owner</span>
-            <AccountFields
-              {...state.owner}
-              decimals={state.mintInfo?.decimals}
-            />
-          </div>
-          <div>
-            <span>Reciever</span>
-            <AccountFields
-              {...state.reciever}
-              decimals={state.mintInfo?.decimals}
-            />
-          </div>
-        </div>
-
-        <p>
-          <a
-            className="App-link"
-            href="https://solana-labs.github.io/solana-web3.js/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Solana Web3
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://www.spl-token-ui.com/#/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            SPL Token App
-          </a>
-          <br />
-          <a
-            className="App-link"
-            href="https://github.com/paul-schaaf/spl-token-ui/blob/main/src/components/tokens/TokenCreator.vue"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            SPL Token Code
-          </a>
-          {' | '}
-          <a
-            className="App-link"
-            href="https://explorer.solana.com/?cluster=devnet"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Solana explorer
-          </a>
-        </p>
       </header>
     </div>
   );
