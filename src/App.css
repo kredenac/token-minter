@@ -20,6 +20,11 @@ body {
   }
 }
 
+.output {
+  width: 250px;
+  margin-top: 5px;
+}
+
 p {
   font-size: large;
   opacity: 0.5;

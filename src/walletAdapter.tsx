@@ -58,6 +58,7 @@ export const Wallet = (props: { children: React.ReactNode }) => {
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { createMintingTransaction } from './genesis';
+import { explorerLink } from './types';
 
 export const ExecutePayment = () => {
   const { publicKey, sendTransaction, signTransaction } = useWallet();
@@ -83,23 +84,39 @@ export const ExecutePayment = () => {
     setMintAddr(mintKeypair.publicKey.toBase58());
   }, [publicKey, sendTransaction, connection]);
 
-  console.log(publicKey);
   return (
-    <div style={{ marginTop: '10px' }}>
-      <button
-        onClick={onClick}
-        disabled={!publicKey}
-        className={(publicKey ? 'just-do-it' : '') + ' wallet-adapter-button'}
-      >
-        {publicKey
-          ? 'Create your new Token!'
-          : 'Connect wallet to create new Token'}
-      </button>
-      {assocAddr && <p>Assocciated Wallet Address {assocAddr}</p>}
-      {assocAddr && <p>Your New Token Address {mintAddr}</p>}
-    </div>
+    <>
+      <div style={{ marginTop: '10px' }}>
+        <button
+          onClick={onClick}
+          disabled={!publicKey}
+          className={(publicKey ? 'just-do-it' : '') + ' wallet-adapter-button'}
+        >
+          {publicKey
+            ? 'Create your new Token!'
+            : 'Connect wallet to create new Token'}
+        </button>
+      </div>
+      {mintAddr && <Output hash={mintAddr} title={'New Token'} />}
+      {assocAddr && (
+        <Output hash={assocAddr} title={'Wallet containing new Token'} />
+      )}
+    </>
   );
 };
+
+function Output(props: { title: string; hash: string }) {
+  return (
+    <a
+      href={explorerLink(props.hash)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="btn btn-info output"
+    >
+      {props.title}
+    </a>
+  );
+}
 
 export function connectWalletAdapter() {
   return 'lmao';
