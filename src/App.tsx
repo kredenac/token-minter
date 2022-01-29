@@ -12,8 +12,7 @@ import { MintInfo } from '@solana/spl-token';
 import { StepProgressBar } from './ProgressSteps';
 import { Wallet } from './walletAdapter';
 
-import { PullRequester } from './PrMaker';
-PullRequester.makePR(false);
+import { TokenInput } from './TokenInput';
 
 const reducer = (state: AppState, update: SetStateParam): AppState => {
   // support both object updates and update through callback
@@ -42,6 +41,7 @@ function App() {
             Start minting!
           </button> */}
         </div>
+        <TokenInput></TokenInput>
       </header>
     </div>
   );

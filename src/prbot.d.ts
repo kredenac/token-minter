@@ -1,1 +1,1 @@
-declare module '@prb0t/pr';
+declare module 'react-image-upload';
