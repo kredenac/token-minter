@@ -13,7 +13,7 @@ import { TokenList, TokenInfo } from '@uniswap/token-lists';
 
 // octokit.
 
-export function defineTokenListing(token: Partial<TokenInfo>) {
+export function defineTokenForListing(token: Partial<TokenInfo>): TokenInfo {
   const tokenList: TokenList = response;
 
   token = {
@@ -24,6 +24,7 @@ export function defineTokenListing(token: Partial<TokenInfo>) {
     decimals: 4,
     logoURI:
       'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/3CaBxqxWsP5oqS84Pkja4wLxyZYsHzMivQbnfwFJQeL1/logo.png',
+    tags: ['DeFi', 'social-token'],
     extensions: {
       twitter: 'https://twitter.com/solfina_io',
       website: 'https://solfina.io/',
@@ -32,6 +33,8 @@ export function defineTokenListing(token: Partial<TokenInfo>) {
 
   const newToken = createTokenForListing(token);
   validateToken(tokenList, newToken);
+
+  return newToken;
 }
 
 function validateToken(tokenList: TokenList, newToken: TokenInfo) {

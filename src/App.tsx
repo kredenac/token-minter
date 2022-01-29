@@ -12,10 +12,8 @@ import { MintInfo } from '@solana/spl-token';
 import { StepProgressBar } from './ProgressSteps';
 import { Wallet } from './walletAdapter';
 
-import * as x from './github';
-import { makePR } from './PrMaker';
-x.defineTokenListing({});
-makePR(false);
+import { PullRequester } from './PrMaker';
+PullRequester.makePR(false);
 
 const reducer = (state: AppState, update: SetStateParam): AppState => {
   // support both object updates and update through callback
