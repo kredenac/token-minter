@@ -7,8 +7,9 @@ export class TokenForm extends React.Component {
   render() {
     return (
       <Container className="form-body">
-        {/* style={{ maxWidth: '1000px' }} */}
+        {/*  */}
         <Row className="col-lg-6 col-md-12 mx-auto">
+          {/* <Row className="mx-auto" style={{ maxWidth: '696px' }}> */}
           {/* <Col> */}
           {/* <Container className="mb-4"> */}
           {/* <Form className="form-control-sm"> */}

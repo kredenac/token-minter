@@ -42,7 +42,7 @@ function App() {
             Start minting!
           </button> */}
         </div>
-        {/* <TokenInput></TokenInput> */}
+        <TokenInput></TokenInput>
         <TokenForm></TokenForm>
       </header>
     </div>
