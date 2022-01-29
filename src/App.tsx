@@ -13,6 +13,7 @@ import { StepProgressBar } from './ProgressSteps';
 import { Wallet } from './walletAdapter';
 
 import { TokenInput } from './TokenInput';
+import { TokenForm } from './TokenForm';
 
 const reducer = (state: AppState, update: SetStateParam): AppState => {
   // support both object updates and update through callback
@@ -29,7 +30,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Wallet>{/* <span> hi</span> */}</Wallet>
+        <Wallet></Wallet>
         <img src={logo} className="App-logo" alt="logo" />
         <p>🚀StreamFlow Token Minter🚀</p>
         <div>
@@ -41,7 +42,8 @@ function App() {
             Start minting!
           </button> */}
         </div>
-        <TokenInput></TokenInput>
+        {/* <TokenInput></TokenInput> */}
+        <TokenForm></TokenForm>
       </header>
     </div>
   );

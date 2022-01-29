@@ -75,5 +75,6 @@ function createTokenForListing(token: Partial<TokenInfo>): TokenInfo {
   return {
     chainId: 101,
     ...token,
+    // TODO logo uri
   } as TokenInfo;
 }

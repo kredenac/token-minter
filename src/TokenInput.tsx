@@ -14,11 +14,9 @@ export function TokenInput() {
   const [img, setImg] = useState<File | undefined>();
 
   const getImageFileObject = async (imageFile: FileWrapper) => {
-    console.log({ imageFile });
     setImg(imageFile.file);
   };
   function runAfterImageDelete(file: FileWrapper) {
-    console.log({ file });
     setImg(undefined);
   }
 
