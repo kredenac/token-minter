@@ -13,7 +13,7 @@ import { StepProgressBar } from './ProgressSteps';
 import { Wallet } from './walletAdapter';
 
 import * as x from './github';
-x.lmao();
+x.defineTokenListing({});
 
 const reducer = (state: AppState, update: SetStateParam): AppState => {
   // support both object updates and update through callback
