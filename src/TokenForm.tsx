@@ -1,20 +1,16 @@
 import React from 'react';
-import {
-  Col,
-  Form,
-  Row,
-  Accordion,
-  Container,
-  ThemeProvider,
-} from 'react-bootstrap';
+import { Col, Form, Row, Accordion, Container } from 'react-bootstrap';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 import 'dark-bootstrap-theme/dist/dark.min.css';
 
 export class TokenForm extends React.Component {
   render() {
     return (
-      <ThemeProvider>
-        <Container className="container-sm">
+      <Container className="form-body">
+        {/* style={{ maxWidth: '1000px' }} */}
+        <Row className="col-lg-6 col-md-12 mx-auto">
+          {/* <Col> */}
+          {/* <Container className="mb-4"> */}
           {/* <Form className="form-control-sm"> */}
           <Accordion defaultActiveKey="0">
             <Accordion.Item eventKey="0">
@@ -55,8 +51,10 @@ export class TokenForm extends React.Component {
             </Col>
           </Row>
           {/* </Form> */}
-        </Container>
-      </ThemeProvider>
+          {/* </Container> */}
+          {/* </Col> */}
+        </Row>
+      </Container>
     );
   }
 }
