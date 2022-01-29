@@ -1,7 +1,6 @@
 import { useReducer } from 'react';
 import logo from './imgs/solana-sol-logo.svg';
 import './App.css';
-import { startMinting } from './minting';
 import {
   AppState,
   defaultAppState,
@@ -12,6 +11,9 @@ import {
 import { MintInfo } from '@solana/spl-token';
 import { StepProgressBar } from './ProgressSteps';
 import { Wallet } from './walletAdapter';
+
+import * as x from './github';
+x.lmao();
 
 const reducer = (state: AppState, update: SetStateParam): AppState => {
   // support both object updates and update through callback
