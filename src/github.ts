@@ -15,28 +15,20 @@ import { TokenList, TokenInfo } from '@uniswap/token-lists';
 
 export function defineTokenListing(token: Partial<TokenInfo>) {
   const tokenList: TokenList = response;
-  // const num = tokenList.tokens.length;
-  // console.log('num', num);
 
-  // const extensions = new Set(
-  //   tokenList.tokens.flatMap((token) => Object.keys(token.extensions || {}))
-  // );
-  // console.log('extensions', extensions);
-
-  // const tags = new Set(tokenList.tokens.flatMap((token) => token.tags || []));
-  // console.log('tags', tags);
-
-  // const chhainIds = new Set(tokenList.tokens.map((token) => token.chainId));
-  // console.log('chhainIds', chhainIds);
-
-  // const maxLength = Math.max(
-  //   ...tokenList.tokens.map((token) => token.symbol.length)
-  // );
-  // console.log(
-  //   'max symbol:',
-  //   maxLength,
-  //   tokenList.tokens.filter((token) => token.symbol.length === 21)
-  // );
+  token = {
+    chainId: 101,
+    address: '777BxqxWsP5oqS84Pkja4wLxyZYsHzMivQbnfwFJQ777',
+    symbol: 'TestSymbol',
+    name: 'TestName',
+    decimals: 4,
+    logoURI:
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/3CaBxqxWsP5oqS84Pkja4wLxyZYsHzMivQbnfwFJQeL1/logo.png',
+    extensions: {
+      twitter: 'https://twitter.com/solfina_io',
+      website: 'https://solfina.io/',
+    },
+  };
 
   const newToken = createTokenForListing(token);
   validateToken(tokenList, newToken);
@@ -70,7 +62,7 @@ function validateToken(tokenList: TokenList, newToken: TokenInfo) {
   }
 
   if (valid) {
-    console.log('Success!');
+    console.log('Success - valid token!');
   } else {
     console.log('Failed validation:');
   }
