@@ -2,10 +2,15 @@ import { TokenInfo } from '@uniswap/token-lists';
 
 const prForUser = 'kredenac';
 
+export type Image = {
+  content?: string;
+  ext?: string;
+  url?: string;
+};
+
 export class PullRequester {
-  static async makePR(token: TokenInfo, imgContent: string, imgExt: string) {
+  static async makePR(token: TokenInfo, image: Image) {
     const file = await PullRequester.fetchTokenListFile();
-    // const token = defineTokenForListing(null as any);
 
     const fileUpdate = PullRequester.addTokenToFile(file, token);
 
@@ -13,8 +18,7 @@ export class PullRequester {
     console.time('bot');
     const response = await PullRequester.makePullRequest(
       fileUpdate,
-      imgContent,
-      imgExt,
+      image,
       token
     );
     console.timeEnd('bot');
@@ -46,10 +50,24 @@ export class PullRequester {
   /** Lasts around 14 seconds, need to show spinner */
   private static async makePullRequest(
     tokenList: string,
-    imgContent: string,
-    imgExt: string,
+    image: Image,
     token: TokenInfo
   ) {
+    const files = [
+      {
+        path: 'src/tokens/solana.tokenlist.json',
+        content: tokenList,
+      },
+    ];
+
+    // If image url is given, no need to upload anything for the image
+    if (image.content) {
+      files.push({
+        path: `assets/mainnet/${token.address}/logo.${image.ext}`,
+        content: image.content,
+      });
+    }
+
     try {
       return await fetch(
         'https://xrbhog4g8g.execute-api.eu-west-2.amazonaws.com/prod/prb0t',
@@ -67,16 +85,7 @@ export class PullRequester {
             description: 'serious attempt',
             title: `Listing ${token.symbol}`,
             commit: `Adding ${token.name} token on behalf of https://www.google.com`,
-            files: [
-              {
-                path: 'src/tokens/solana.tokenlist.json',
-                content: tokenList,
-              },
-              {
-                path: `assets/mainnet/${token.address}/logo.${imgExt}`,
-                content: imgContent,
-              },
-            ],
+            files,
           }),
         }
       ).catch((error) => console.log('catch error:', error));

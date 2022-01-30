@@ -15,6 +15,7 @@ import { createMintingTransaction } from './genesis';
 import { defineTokenForListing } from './github';
 import { TokenInfo } from '@uniswap/token-lists';
 import { TokenForm } from './TokenForm';
+import { PullRequester } from './PrMaker';
 
 export type AppState = {
   tokenPubKey?: string;
@@ -63,7 +64,7 @@ class App extends React.Component<{}, AppState> {
   });
 
   onCreateNewToken = async () => {
-    const { wallet, connection } = this.state;
+    const { wallet, connection, tokenInfo } = this.state;
     if (!wallet || !connection) throw new WalletNotConnectedError('no pubkey');
     const { publicKey, sendTransaction, signTransaction } = wallet;
 
@@ -84,9 +85,13 @@ class App extends React.Component<{}, AppState> {
     this.setAssociatedAddress(associatedAddress.toBase58());
     this.setMintAddress(mintKeypair.publicKey.toBase58());
 
-    if (!this.isTokenValid()) throw new Error('Invalid token');
+    const token = this.isTokenValid();
+    if (!token) throw new Error('Invalid token');
 
-    // PullRequester.makePR()
+    const image = {
+      url: tokenInfo!.imageUrl,
+    };
+    await PullRequester.makePR(token, image);
   };
 
   isTokenValid() {
@@ -113,10 +118,10 @@ class App extends React.Component<{}, AppState> {
     };
     const result = defineTokenForListing(token);
     if (typeof result === 'string') {
-      return false;
+      return undefined;
     }
 
-    return true;
+    return result;
   }
 
   render() {
