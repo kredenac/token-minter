@@ -13,7 +13,7 @@ import { TokenInfo } from '@uniswap/token-lists';
 import { TokenInput } from './TokenInput';
 
 type TokenFormPropos = {
-  onSumbmit: (token: TokenInfo) => void;
+  onSubmit: (token: TokenInfo) => void;
 };
 
 interface TokenFormState extends TokenInfo {

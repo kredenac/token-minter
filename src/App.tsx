@@ -4,15 +4,37 @@ import { explorerLink, IAccountState } from './types';
 import { MintInfo } from '@solana/spl-token';
 import { Wallet } from './walletAdapter';
 import React from 'react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import {
+  WalletAdapterNetwork,
+  WalletNotConnectedError,
+} from '@solana/wallet-adapter-base';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { WalletContextState } from '@solana/wallet-adapter-react';
+import { Connection } from '@solana/web3.js';
+import { createMintingTransaction } from './genesis';
+import { defineTokenForListing } from './github';
+import { TokenInfo } from '@uniswap/token-lists';
+import { TokenForm } from './TokenForm';
 
 export type AppState = {
   tokenPubKey?: string;
   network: WalletAdapterNetwork;
-  mintInfo?: MintInfo;
-  // totalSteps: number;
-  // currentSteps: number;
+  mintAddr?: string;
+  associatedAccount?: string;
+  wallet?: WalletContextState;
+  connection?: Connection;
+  tokenInfo?: BonusTokenInfo;
+};
+
+export type BonusTokenInfo = {
+  symbol: string;
+  name: string;
+  decimals: number;
+  imageUrl: string;
+  imageFile: string;
+  website: string;
+  twitter: string;
+  tags: string[];
 };
 
 class App extends React.Component<{}, AppState> {
@@ -24,10 +46,78 @@ class App extends React.Component<{}, AppState> {
     } as any;
   }
 
+  setMintAddress = (mint: string) => this.setState({ mintAddr: mint });
+  setAssociatedAddress = (associatedAccount: string) =>
+    this.setState({ associatedAccount });
+
   setNetwork = (network: WalletAdapterNetwork) => {
     this.setState({ network });
     console.log(network);
   };
+
+  setPaymentContext = (wallet: WalletContextState, connection: Connection) =>
+    this.setState({ wallet, connection });
+
+  getPaymentProps = () => ({
+    setPaymentContext: this.setPaymentContext,
+  });
+
+  onCreateNewToken = async () => {
+    const { wallet, connection } = this.state;
+    if (!wallet || !connection) throw new WalletNotConnectedError('no pubkey');
+    const { publicKey, sendTransaction, signTransaction } = wallet;
+
+    if (!publicKey) throw new WalletNotConnectedError('no pubkey');
+    if (!signTransaction)
+      throw new WalletNotConnectedError('no sign transaction');
+
+    // TODO propagate token info here
+    const { transaction, associatedAddress, mintKeypair } =
+      await createMintingTransaction({ publicKey, connection });
+
+    const signature = await sendTransaction(transaction, connection, {
+      signers: [mintKeypair],
+    });
+
+    await connection.confirmTransaction(signature, 'processed');
+
+    this.setAssociatedAddress(associatedAddress.toBase58());
+    this.setMintAddress(mintKeypair.publicKey.toBase58());
+
+    if (!this.isTokenValid()) throw new Error('Invalid token');
+
+    // PullRequester.makePR()
+  };
+
+  isTokenValid() {
+    const { mintAddr, associatedAccount, wallet, tokenInfo } = this.state;
+    const owner = wallet!.publicKey!;
+    if (!tokenInfo) throw new Error('No token info');
+
+    const extensions = {
+      website: tokenInfo.website,
+      twitter: tokenInfo.twitter,
+    };
+
+    const tags = tokenInfo.tags.length ? tokenInfo.tags : undefined;
+
+    const token: TokenInfo = {
+      chainId: 101,
+      address: mintAddr!,
+      name: tokenInfo.name,
+      decimals: tokenInfo.decimals,
+      symbol: tokenInfo.symbol,
+      logoURI: tokenInfo.imageUrl, // TODO construct url for uploaded file
+      extensions,
+      tags,
+    };
+    const result = defineTokenForListing(token);
+    if (typeof result === 'string') {
+      return false;
+    }
+
+    return true;
+  }
 
   render() {
     const { network } = this.state;
@@ -40,17 +130,9 @@ class App extends React.Component<{}, AppState> {
           ></NetworkSelector>
         </header>
         <main className="App-body">
-          <Wallet network={network}></Wallet>
-          <div>
-            {/* <StepProgressBar
-              currentStep={state.currentSteps}
-              totalSteps={state.totalSteps}
-            /> */}
-            {/* <button type="button" onClick={() => startMinting(setState)}>
-            Start minting!
-          </button> */}
-          </div>
-          {/* <TokenForm onSumbmit={() => console.log('top submit')}></TokenForm> */}
+          <Wallet network={network} payment={this.getPaymentProps()}>
+            <TokenForm onSubmit={this.onCreateNewToken}></TokenForm>
+          </Wallet>
         </main>
         <footer>
           <img src={logo} className="App-logo" alt="logo" />

@@ -1,12 +1,11 @@
 import { TokenInfo } from '@uniswap/token-lists';
-import { defineTokenForListing } from './github';
 
 const prForUser = 'kredenac';
 
 export class PullRequester {
-  static async makePR(imgContent: string, imgExt: string) {
+  static async makePR(token: TokenInfo, imgContent: string, imgExt: string) {
     const file = await PullRequester.fetchTokenListFile();
-    const token = defineTokenForListing(null as any);
+    // const token = defineTokenForListing(null as any);
 
     const fileUpdate = PullRequester.addTokenToFile(file, token);
 
@@ -23,14 +22,14 @@ export class PullRequester {
     console.log('bot response', response);
   }
 
-  static async fetchTokenListFile() {
+  private static async fetchTokenListFile() {
     const response = await fetch(
       `https://raw.githubusercontent.com/${prForUser}/token-list/main/src/tokens/solana.tokenlist.json`
     );
     return await response.text();
   }
 
-  static addTokenToFile(file: string, token: TokenInfo): string {
+  private static addTokenToFile(file: string, token: TokenInfo): string {
     const lines = file.split('\n');
 
     const newLines = JSON.stringify(token, null, 2)
@@ -45,7 +44,7 @@ export class PullRequester {
   }
 
   /** Lasts around 14 seconds, need to show spinner */
-  static async makePullRequest(
+  private static async makePullRequest(
     tokenList: string,
     imgContent: string,
     imgExt: string,
@@ -89,4 +88,4 @@ export class PullRequester {
 }
 
 (window as any).makePR = PullRequester.makePR;
-(window as any).fetchTokenList = PullRequester.fetchTokenListFile;
+// (window as any).fetchTokenList = PullRequester.fetchTokenListFile;

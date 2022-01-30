@@ -39,19 +39,6 @@ export class AccountState implements IAccountState {
   }
 }
 
-export const defaultAppState: AppState = {
-  count: 0,
-  environment,
-  currentSteps: 0,
-  totalSteps: 7,
-};
-
-export type SetStateParam =
-  | Partial<AppState>
-  | ((inState: AppState) => Partial<AppState>);
-
-export type SetState = (state: SetStateParam) => void;
-
 export function stringifySafe(obj: any, spacing: number = 2): string {
   return JSON.stringify(
     obj,

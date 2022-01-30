@@ -14,12 +14,6 @@ body {
     sans-serif;
 }
 
-/* @media (prefers-reduced-motion: no-preference) { */
-  /* .App-logo { */
-    /* animation: App-logo-spin infinite 2s cubic-bezier(.75,-0.01,.25,.98); */
-  /* } */
-/* } */
-
 .output {
   width: 250px;
   margin-top: 5px;
@@ -32,7 +26,7 @@ p {
 
 .App-body {
   background-color: #1a1d24;
-  min-height: 90vh;
+  min-height: 87vh;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -45,18 +39,6 @@ p {
 .App-link {
   color: #61dafb;
 }
-
-/* @keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(80deg);
-  }
-  to {
-    transform: rotate(0deg);
-  }
-} */
 
 button {
   font-size: calc(10px + 2vmin);
