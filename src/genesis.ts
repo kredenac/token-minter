@@ -15,13 +15,15 @@ import {
 export async function createMintingTransaction(args: {
   publicKey: PublicKey;
   connection: Connection;
+  decimals: number;
+  amount: number;
 }): Promise<{
   transaction: Transaction;
   associatedAddress: PublicKey;
   mintKeypair: Keypair;
 }> {
   const mintKeypair = Keypair.generate();
-  const { publicKey } = args;
+  const { publicKey, decimals, amount } = args;
 
   const associatedAddress = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -44,9 +46,9 @@ export async function createMintingTransaction(args: {
     Token.createInitMintInstruction(
       TOKEN_PROGRAM_ID,
       mintKeypair.publicKey,
-      5, // TODO variable
+      decimals,
       publicKey,
-      null // TODO variable
+      publicKey // TODO variable
     ),
     Token.createAssociatedTokenAccountInstruction(
       ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -62,7 +64,7 @@ export async function createMintingTransaction(args: {
       associatedAddress,
       publicKey,
       [],
-      17
+      amount
     )
   );
 

@@ -14,10 +14,16 @@ export function Results(props: {
       <Row>
         <Col md>
           <InfoLink label="Token Mint" value={props.mintAddr} />
-          <InfoLink label="Associated Account" value={props.mintAddr} />
-
+          <InfoLink
+            label="Associated Account"
+            value={props.associatedAccount}
+          />
           <PullRequest prLink={props.prLink} />
-          {props.uxState === 'done' ? <Congrats /> : <Loading />}
+          {props.uxState === 'done' ? (
+            <Congrats />
+          ) : (
+            <Loading tokenCreated={!!props.associatedAccount} />
+          )}
         </Col>
       </Row>
     </Container>
@@ -44,14 +50,14 @@ function Congrats() {
   );
 }
 
-function Loading() {
+function Loading(props: { tokenCreated: boolean }) {
   return (
     <>
       <ReactLoading type="bars" color="#888" className="mx-auto" />
       <p>
-        {
-          'Creating your token, please wait for 20 seconds. Do not close this page. '
-        }
+        {props.tokenCreated
+          ? 'Your token is created, please wait for 15 seconds to create Pull Request. Do not close this page. '
+          : 'Creating your token, please wait for 20 seconds. Do not close this page. '}
       </p>
     </>
   );
@@ -74,10 +80,13 @@ function InfoLink(props: { label: string; value?: string | number }) {
 }
 
 function ExplorerLabel(props: { address: string; label: string }) {
+  const link = props.address.includes('github')
+    ? props.address
+    : explorerLink(props.address);
   return (
     <a
       className="App-link"
-      href={explorerLink(props.address)}
+      href={link}
       target="_blank"
       rel="noopener noreferrer"
     >

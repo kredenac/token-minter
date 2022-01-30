@@ -6,7 +6,7 @@ import {
   WalletAdapterNetwork,
   WalletNotConnectedError,
 } from '@solana/wallet-adapter-base';
-import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import { WalletContextState } from '@solana/wallet-adapter-react';
 import { Connection } from '@solana/web3.js';
 import { createMintingTransaction } from './genesis';
@@ -55,64 +55,79 @@ class App extends React.Component<{}, AppState> {
   });
 
   onFormSuccessful = async (newTokenInfo: BonusTokenInfo) => {
-    this.setState(
-      { tokenInfo: newTokenInfo, uxState: 'loading' },
-      this.onCreateNewToken
-    );
+    this.setState({ tokenInfo: newTokenInfo }, this.onCreateNewToken);
   };
 
   onCreateNewToken = async () => {
+    this.setState({ uxState: 'loading' });
     const { wallet, connection, tokenInfo } = this.state;
 
-    if (!wallet || !connection) throw new WalletNotConnectedError('no pubkey');
+    if (!wallet || !connection)
+      throw new WalletNotConnectedError('no connection');
     const { publicKey, sendTransaction, signTransaction } = wallet;
 
     if (!publicKey) throw new WalletNotConnectedError('no pubkey');
-    if (!signTransaction)
+    if (!signTransaction || !tokenInfo)
       throw new WalletNotConnectedError('no sign transaction');
 
-    if (Math.random()) return;
-
-    // TODO propagate token info here
     const { transaction, associatedAddress, mintKeypair } =
-      await createMintingTransaction({ publicKey, connection });
+      await createMintingTransaction({
+        publicKey,
+        connection,
+        amount: tokenInfo.supply,
+        decimals: tokenInfo.decimals,
+      });
 
     const mintAddr = mintKeypair.publicKey.toBase58();
     const token = this.isTokenValid(mintAddr);
-    if (!token) {
-      this.setState({ errorLog: 'Token is invalid and will not be created' });
+    if (!token || typeof token === 'string') {
+      this.setState({
+        errorLog: 'Token is invalid and will not be created:' + token,
+      });
       return;
     }
+
+    let signature = '';
+    try {
+      signature = await sendTransaction(transaction, connection, {
+        signers: [mintKeypair],
+      });
+    } catch (e: any) {
+      this.setState({
+        errorLog: 'Token creation transaction failed: ' + e.message,
+      });
+      return;
+    }
+
     this.setAssociatedAddress(associatedAddress.toBase58());
     this.setMintAddress(mintAddr);
-
-    const signature = await sendTransaction(transaction, connection, {
-      signers: [mintKeypair],
-    });
 
     try {
       await connection.confirmTransaction(signature, 'processed');
     } catch (e: any) {
-      this.setState({ errorLog: 'Token creation failed: ' + e.message });
+      this.setState({
+        errorLog: 'Token transaction confirmation failed: ' + e.message,
+      });
       return;
     }
 
     const image = {
       url: tokenInfo!.imageUrl,
     };
+    // TODO have some timeout
     const prUrl = await PullRequester.makePR(token, image);
-    this.setState({ prUrl });
+    this.setState({ prUrl, uxState: 'done' });
   };
 
   isTokenValid(mintAddr: string) {
     const { tokenInfo } = this.state;
-    // const owner = wallet!.publicKey!;
     if (!tokenInfo) throw new Error('No token info');
 
     const extensions = {
       website: tokenInfo.website,
       twitter: tokenInfo.twitter,
     };
+    if (!extensions.twitter) delete extensions.twitter;
 
     const tags = tokenInfo.tags.length ? tokenInfo.tags : undefined;
 
@@ -127,14 +142,14 @@ class App extends React.Component<{}, AppState> {
       tags,
     };
     const result = defineTokenForListing(token);
-    if (typeof result === 'string') {
-      return undefined;
-    }
-
     return result;
   }
 
   render() {
+    if (this.state.errorLog) {
+      return <ErrorReport error={this.state.errorLog} />;
+    }
+
     const { network } = this.state;
     return (
       <div className="App">
@@ -146,18 +161,20 @@ class App extends React.Component<{}, AppState> {
         </header>
         <main className="App-body">
           <Results
-            mintAddr="asd"
-            associatedAccount="123"
-            prLink={'https://www.google.co'}
+            mintAddr={this.state.mintAddr}
+            associatedAccount={this.state.associatedAccount}
+            prLink={this.state.prUrl}
+            uxState={this.state.uxState}
           />
           <Wallet network={network} payment={this.getPaymentProps()}>
-            <TokenForm onSubmit={this.onFormSuccessful}></TokenForm>
+            <div
+              style={{
+                display: this.state.uxState === 'loading' ? 'none' : 'auto',
+              }}
+            >
+              <TokenForm onSubmit={this.onFormSuccessful} />
+            </div>
           </Wallet>
-          {this.state.errorLog && (
-            <span className="btn alert alert-danger h-2" role="alert">
-              {this.state.errorLog}
-            </span>
-          )}
         </main>
         <footer>
           <img src={logo} className="App-logo" alt="logo" />
@@ -166,6 +183,19 @@ class App extends React.Component<{}, AppState> {
       </div>
     );
   }
+}
+
+function ErrorReport(props: { error?: string }) {
+  if (!props.error) return null;
+  return (
+    <div>
+      <p className="btn alert alert-danger h-2" role="alert">
+        {'An error occurred: ' + props.error}
+      </p>
+      <br />
+      <Button onClick={() => window.location.reload()}>Try again</Button>
+    </div>
+  );
 }
 
 function NetworkSelector(props: {

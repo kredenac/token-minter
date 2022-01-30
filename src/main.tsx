@@ -14,6 +14,7 @@ ReactDOM.render(
 );
 
 function ErrorFallback(props: FallbackProps) {
+  console.log(props.error);
   return (
     <div role="alert">
       <p>Something went wrong:</p>
