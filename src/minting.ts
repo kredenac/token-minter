@@ -8,15 +8,9 @@ import {
 } from './genesis';
 import keys from '../devnetkeys.json';
 import bs58 from 'bs58';
-import {
-  AccountState,
-  AppState,
-  environment,
-  SetState,
-  TransactionPair,
-} from './types';
+import { AccountState, environment, TransactionPair } from './types';
 
-export async function startMinting(setState: SetState) {
+export async function startMinting() {
   // if (connectWalletAdapter()) {
   //   return;
   // }
@@ -28,28 +22,13 @@ export async function startMinting(setState: SetState) {
     'confirmed'
   );
 
-  setState({ currentSteps: 0 });
   const pair = getFromAndTo();
-  setState({
-    owner: new AccountState(pair.from),
-    reciever: new AccountState(pair.to),
-  });
 
-  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
   const newToken = await createToken(connection, pair);
-  setState({ tokenPubKey: newToken.publicKey.toBase58() });
-  // if (Math.random()) return;
-  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 
-  await mintNewCoinsOnToken(
-    connection,
-    newToken.publicKey,
-    pair.from,
-    pair.to,
-    setState
-  );
+  await mintNewCoinsOnToken(connection, newToken.publicKey, pair.from, pair.to);
 
-  await updateMintAndAccountInfo(setState, newToken, pair.from.publicKey);
+  await updateMintAndAccountInfo(newToken, pair.from.publicKey);
 }
 
 export function getFromAndTo(): TransactionPair {

@@ -14,7 +14,7 @@ import { Connection } from '@solana/web3.js';
 import { createMintingTransaction } from './genesis';
 import { defineTokenForListing } from './github';
 import { TokenInfo } from '@uniswap/token-lists';
-import { TokenForm } from './TokenForm';
+import { BonusTokenInfo, TokenForm } from './TokenForm';
 import { PullRequester } from './PrMaker';
 
 export type AppState = {
@@ -25,17 +25,6 @@ export type AppState = {
   wallet?: WalletContextState;
   connection?: Connection;
   tokenInfo?: BonusTokenInfo;
-};
-
-export type BonusTokenInfo = {
-  symbol: string;
-  name: string;
-  decimals: number;
-  imageUrl: string;
-  imageFile: string;
-  website: string;
-  twitter: string;
-  tags: string[];
 };
 
 class App extends React.Component<{}, AppState> {

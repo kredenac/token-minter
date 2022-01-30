@@ -22,11 +22,10 @@ import {
 import { clusterApiUrl, Connection } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { explorerLink } from './types';
-import { TokenForm } from './TokenForm';
 import '@solana/wallet-adapter-react-ui/styles.css';
 
 export const Wallet = (props: {
-  children?: React.ReactNode;
+  children: React.ReactNode;
   network: WalletAdapterNetwork;
   payment: ExecutePaymentProps;
 }) => {
@@ -71,14 +70,14 @@ type ExecutePaymentProps = {
 };
 
 export const ExecutePayment = (
-  props: ExecutePaymentProps & { children: React.ReactNode }
+  props: ExecutePaymentProps & { children: React.ReactNode[] }
 ) => {
   const wallet = useWallet();
   const { connection } = useConnection();
 
   useEffect(
     () => props.setPaymentContext(wallet, connection),
-    [wallet, connection]
+    [wallet.publicKey]
   );
 
   if (wallet.publicKey && props.children) {

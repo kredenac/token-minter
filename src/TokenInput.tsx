@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
-import ImageUploader from 'react-image-upload';
-import 'react-image-upload/dist/index.css';
+// import ImageUploader from 'react-image-upload';
+// import 'react-image-upload/dist/index.css';
 import { PullRequester } from './PrMaker';
 
 type FileWrapper = {
@@ -38,15 +38,14 @@ export function TokenInput() {
       console.log('Only .svg image type is supported');
       return;
     }
-
-    PullRequester.makePR(imgContent, imgExt);
   }, [img]);
 
   return (
-    <ImageUploader
-      onFileAdded={(img: FileWrapper) => getImageFileObject(img)}
-      onFileRemoved={(img: FileWrapper) => runAfterImageDelete(img)}
-    />
+    // <ImageUploader
+    //   onFileAdded={(img: FileWrapper) => getImageFileObject(img)}
+    //   onFileRemoved={(img: FileWrapper) => runAfterImageDelete(img)}
+    // />
+    null
   );
 }
 

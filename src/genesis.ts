@@ -12,8 +12,7 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   MintLayout,
 } from '@solana/spl-token';
-import { AppState, SetState, stringifySafe, TransactionPair } from './types';
-import { useConnection } from '@solana/wallet-adapter-react';
+import { stringifySafe, TransactionPair } from './types';
 
 export async function createMintingTransaction(args: {
   publicKey: PublicKey;
@@ -106,8 +105,7 @@ export async function mintNewCoinsOnToken(
   connection: Connection,
   mintAddress: PublicKey,
   payer: Keypair,
-  dest: PublicKey,
-  setState: SetState
+  dest: PublicKey
 ) {
   // TODO: check if it needs to be created again, or we can reuse it from before
   const token = new Token(connection, mintAddress, TOKEN_PROGRAM_ID, payer);
@@ -118,15 +116,7 @@ export async function mintNewCoinsOnToken(
     payer.publicKey
   );
 
-  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
-
   const mintInfo = await token.getMintInfo();
-
-  setState((state) => ({
-    owner: state.owner!.updateFrom(fromTokenAccount),
-    mintInfo,
-    currentSteps: state.currentSteps + 1,
-  }));
 
   await token.mintTo(
     fromTokenAccount.address,
@@ -136,26 +126,18 @@ export async function mintNewCoinsOnToken(
   );
 
   console.log('minted coins');
-  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 }
 
 export async function updateMintAndAccountInfo(
-  setState: SetState,
   token: Token,
   accToUpdate: PublicKey
 ) {
   const mintInfoAFter = await token.getMintInfo();
   console.log('Updated mint info');
-  setState({ mintInfo: mintInfoAFter });
-  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
 
   const fromTokenAccount = await token.getOrCreateAssociatedAccountInfo(
     accToUpdate
   );
-  setState((state) => ({
-    owner: state.owner!.updateFrom(fromTokenAccount),
-  }));
-  setState((state: AppState) => ({ currentSteps: state.currentSteps + 1 }));
   console.log('Updated account info');
 }
 

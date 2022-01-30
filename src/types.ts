@@ -1,4 +1,4 @@
-import { AccountInfo, MintInfo } from '@solana/spl-token';
+import { AccountInfo } from '@solana/spl-token';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import bs58 from 'bs58';
 
