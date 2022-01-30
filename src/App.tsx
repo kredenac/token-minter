@@ -123,11 +123,10 @@ class App extends React.Component<{}, AppState> {
     const { tokenInfo } = this.state;
     if (!tokenInfo) throw new Error('No token info');
 
-    const extensions = {
+    const extensions: Record<string, string> = {
       website: tokenInfo.website,
-      twitter: tokenInfo.twitter,
     };
-    if (!extensions.twitter) delete extensions.twitter;
+    if (tokenInfo.twitter) extensions.twitter = tokenInfo.twitter;
 
     const tags = tokenInfo.tags.length ? tokenInfo.tags : undefined;
 

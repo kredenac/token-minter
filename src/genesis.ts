@@ -64,7 +64,8 @@ export async function createMintingTransaction(args: {
       associatedAddress,
       publicKey,
       [],
-      amount
+      // amount is counted in lowest denominator
+      amount * 10 ** decimals
     )
   );
 

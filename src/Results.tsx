@@ -45,7 +45,8 @@ function PullRequest(props: { prLink?: string }) {
 function Congrats() {
   return (
     <div className="alert alert-success" role="alert">
-      Congratulations, you minted a new token! Save the above links.
+      Congratulations, you minted a new token! <br />
+      Save the above links.
     </div>
   );
 }

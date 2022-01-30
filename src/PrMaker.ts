@@ -84,7 +84,7 @@ export class PullRequester {
           body: JSON.stringify({
             user: prForUser,
             repo: 'token-list',
-            description: 'serious attempt',
+            description: `Adding ${token.name} token on behalf of https://www.google.com`,
             title: `Listing ${token.symbol}`,
             commit: `Adding ${token.name} token on behalf of https://www.google.com`,
             files,
