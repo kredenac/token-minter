@@ -4,16 +4,6 @@ import bs58 from 'bs58';
 
 export type TransactionPair = { from: Keypair; to: PublicKey };
 export const environment: 'local' | 'devnet' = 'devnet';
-export type AppState = {
-  count: number;
-  tokenPubKey?: string;
-  environment: typeof environment;
-  owner?: AccountState;
-  reciever?: AccountState;
-  mintInfo?: MintInfo;
-  totalSteps: number;
-  currentSteps: number;
-};
 
 export interface IAccountState {
   publicKey?: string;

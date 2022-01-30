@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
   ConnectionProvider,
+  WalletContextState,
   WalletProvider,
 } from '@solana/wallet-adapter-react';
 import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
@@ -18,12 +19,15 @@ import {
   WalletDisconnectButton,
   WalletMultiButton,
 } from '@solana/wallet-adapter-react-ui';
-import { clusterApiUrl } from '@solana/web3.js';
+import { clusterApiUrl, Connection } from '@solana/web3.js';
 
 import '@solana/wallet-adapter-react-ui/styles.css';
 
-export const Wallet = (props: { children?: React.ReactNode }) => {
-  const network = WalletAdapterNetwork.Devnet;
+export const Wallet = (props: {
+  children?: React.ReactNode;
+  network: WalletAdapterNetwork;
+}) => {
+  const { network } = props;
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
   const wallets = useMemo(
@@ -63,41 +67,51 @@ import { createMintingTransaction } from './genesis';
 import { explorerLink } from './types';
 import { TokenForm } from './TokenForm';
 
-export const ExecutePayment = () => {
-  const { publicKey, sendTransaction, signTransaction } = useWallet();
-  const [assocAddr, setAssocAddr] = useState('');
-  const [mintAddr, setMintAddr] = useState('');
+type ExecutePaymentProps = {
+  setMintAddress: (mint: string) => void;
+  setAssocciatedAddress: (assoc: string) => void;
+  setPaymentContext: (
+    wallet: Partial<WalletContextState>,
+    connection: Connection
+  ) => void;
+};
 
+export const ExecutePayment = (props: ExecutePaymentProps) => {
+  // const { publicKey, sendTransaction, signTransaction } = useWallet();
+  const wallet = useWallet();
   const { connection } = useConnection();
-  const onClick = useCallback(async () => {
-    if (!publicKey) throw new WalletNotConnectedError('no pubkey');
-    if (!signTransaction)
-      throw new WalletNotConnectedError('no sign transaction');
 
-    const { transaction, associatedAddress, mintKeypair } =
-      await createMintingTransaction({ publicKey, connection });
+  // props.setPaymentContext(wallet, connection);
 
-    const signature = await sendTransaction(transaction, connection, {
-      signers: [mintKeypair],
-    });
+  // const onClick = useCallback(async () => {
+  //   if (!publicKey) throw new WalletNotConnectedError('no pubkey');
+  //   if (!signTransaction)
+  //     throw new WalletNotConnectedError('no sign transaction');
 
-    await connection.confirmTransaction(signature, 'processed');
+  //   const { transaction, associatedAddress, mintKeypair } =
+  //     await createMintingTransaction({ publicKey, connection });
 
-    setAssocAddr(associatedAddress.toBase58());
-    setMintAddr(mintKeypair.publicKey.toBase58());
-  }, [publicKey, sendTransaction, connection]);
+  //   const signature = await sendTransaction(transaction, connection, {
+  //     signers: [mintKeypair],
+  //   });
 
-  if (publicKey) {
+  //   await connection.confirmTransaction(signature, 'processed');
+
+  //   props.setAssocciatedAddress(associatedAddress.toBase58());
+  //   props.setMintAddress(mintKeypair.publicKey.toBase58());
+  // }, [publicKey, sendTransaction, connection]);
+
+  if (wallet.publicKey) {
     return <TokenForm onSumbmit={() => console.log('top submit')}></TokenForm>;
   }
 
   return (
     <>
       <p>Connect wallet to create new Token</p>
-      {mintAddr && <Output hash={mintAddr} title={'New Token'} />}
+      {/* {mintAddr && <Output hash={mintAddr} title={'New Token'} />}
       {assocAddr && (
         <Output hash={assocAddr} title={'Wallet containing new Token'} />
-      )}
+      )} */}
     </>
   );
 };

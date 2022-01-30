@@ -1,49 +1,88 @@
-import { useReducer } from 'react';
 import logo from './imgs/solana-sol-logo.svg';
 import './App.css';
-import {
-  AppState,
-  defaultAppState,
-  explorerLink,
-  IAccountState,
-  SetStateParam,
-} from './types';
+import { explorerLink, IAccountState } from './types';
 import { MintInfo } from '@solana/spl-token';
-import { StepProgressBar } from './ProgressSteps';
 import { Wallet } from './walletAdapter';
+import React from 'react';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { Dropdown, DropdownButton } from 'react-bootstrap';
 
-const reducer = (state: AppState, update: SetStateParam): AppState => {
-  // support both object updates and update through callback
-  let newState = update;
-  if (typeof update === 'function') {
-    newState = update(state);
-  }
-  return { ...state, ...newState };
+export type AppState = {
+  tokenPubKey?: string;
+  network: WalletAdapterNetwork;
+  mintInfo?: MintInfo;
+  // totalSteps: number;
+  // currentSteps: number;
 };
 
-function App() {
-  const [state, setState] = useReducer(reducer, defaultAppState);
+class App extends React.Component<{}, AppState> {
+  constructor(props: {}) {
+    super(props);
+    this.state = {
+      showImgUpload: false,
+      network: WalletAdapterNetwork.Devnet,
+    } as any;
+  }
 
-  return (
-    <div className="App">
-      <main className="App-body">
-        <Wallet></Wallet>
-        <div>
-          <StepProgressBar
-            currentStep={state.currentSteps}
-            totalSteps={state.totalSteps}
-          />
-          {/* <button type="button" onClick={() => startMinting(setState)}>
+  setNetwork = (network: WalletAdapterNetwork) => {
+    this.setState({ network });
+    console.log(network);
+  };
+
+  render() {
+    const { network } = this.state;
+    return (
+      <div className="App">
+        <header>
+          <NetworkSelector
+            setNetwork={this.setNetwork}
+            currentNetwork={network}
+          ></NetworkSelector>
+        </header>
+        <main className="App-body">
+          <Wallet network={network}></Wallet>
+          <div>
+            {/* <StepProgressBar
+              currentStep={state.currentSteps}
+              totalSteps={state.totalSteps}
+            /> */}
+            {/* <button type="button" onClick={() => startMinting(setState)}>
             Start minting!
           </button> */}
-        </div>
-        {/* <TokenForm onSumbmit={() => console.log('top submit')}></TokenForm> */}
-      </main>
-      <footer>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>🚀StreamFlow Token Minter🚀</p>
-      </footer>
-    </div>
+          </div>
+          {/* <TokenForm onSumbmit={() => console.log('top submit')}></TokenForm> */}
+        </main>
+        <footer>
+          <img src={logo} className="App-logo" alt="logo" />
+          <p>🚀StreamFlow Token Minter🚀</p>
+        </footer>
+      </div>
+    );
+  }
+}
+
+function NetworkSelector(props: {
+  currentNetwork: WalletAdapterNetwork;
+  setNetwork: (net: WalletAdapterNetwork) => void;
+}) {
+  return (
+    <DropdownButton title={props.currentNetwork}>
+      <Dropdown.Item
+        onClick={() => props.setNetwork(WalletAdapterNetwork.Devnet)}
+      >
+        DevNet
+      </Dropdown.Item>
+      <Dropdown.Item
+        onClick={() => props.setNetwork(WalletAdapterNetwork.Testnet)}
+      >
+        TestNet
+      </Dropdown.Item>
+      <Dropdown.Item
+        onClick={() => props.setNetwork(WalletAdapterNetwork.Mainnet)}
+      >
+        MainNet
+      </Dropdown.Item>
+    </DropdownButton>
   );
 }
 
