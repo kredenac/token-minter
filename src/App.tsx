@@ -1,7 +1,5 @@
 import logo from './imgs/solana-sol-logo.svg';
 import './App.css';
-import { explorerLink, IAccountState } from './types';
-import { MintInfo } from '@solana/spl-token';
 import { Wallet } from './walletAdapter';
 import React from 'react';
 import {
@@ -16,6 +14,8 @@ import { defineTokenForListing } from './github';
 import { TokenInfo } from '@uniswap/token-lists';
 import { BonusTokenInfo, TokenForm } from './TokenForm';
 import { PullRequester } from './PrMaker';
+import { Results } from './Results';
+import { UxState } from './types';
 
 export type AppState = {
   tokenPubKey?: string;
@@ -25,15 +25,18 @@ export type AppState = {
   wallet?: WalletContextState;
   connection?: Connection;
   tokenInfo?: BonusTokenInfo;
+  errorLog?: string;
+  prUrl?: string;
+  uxState: UxState;
 };
 
 class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      showImgUpload: false,
+      uxState: 'initial',
       network: WalletAdapterNetwork.Devnet,
-    } as any;
+    };
   }
 
   setMintAddress = (mint: string) => this.setState({ mintAddr: mint });
@@ -42,7 +45,6 @@ class App extends React.Component<{}, AppState> {
 
   setNetwork = (network: WalletAdapterNetwork) => {
     this.setState({ network });
-    console.log(network);
   };
 
   setPaymentContext = (wallet: WalletContextState, connection: Connection) =>
@@ -52,8 +54,16 @@ class App extends React.Component<{}, AppState> {
     setPaymentContext: this.setPaymentContext,
   });
 
+  onFormSuccessful = async (newTokenInfo: BonusTokenInfo) => {
+    this.setState(
+      { tokenInfo: newTokenInfo, uxState: 'loading' },
+      this.onCreateNewToken
+    );
+  };
+
   onCreateNewToken = async () => {
     const { wallet, connection, tokenInfo } = this.state;
+
     if (!wallet || !connection) throw new WalletNotConnectedError('no pubkey');
     const { publicKey, sendTransaction, signTransaction } = wallet;
 
@@ -61,31 +71,42 @@ class App extends React.Component<{}, AppState> {
     if (!signTransaction)
       throw new WalletNotConnectedError('no sign transaction');
 
+    if (Math.random()) return;
+
     // TODO propagate token info here
     const { transaction, associatedAddress, mintKeypair } =
       await createMintingTransaction({ publicKey, connection });
+
+    const mintAddr = mintKeypair.publicKey.toBase58();
+    const token = this.isTokenValid(mintAddr);
+    if (!token) {
+      this.setState({ errorLog: 'Token is invalid and will not be created' });
+      return;
+    }
+    this.setAssociatedAddress(associatedAddress.toBase58());
+    this.setMintAddress(mintAddr);
 
     const signature = await sendTransaction(transaction, connection, {
       signers: [mintKeypair],
     });
 
-    await connection.confirmTransaction(signature, 'processed');
-
-    this.setAssociatedAddress(associatedAddress.toBase58());
-    this.setMintAddress(mintKeypair.publicKey.toBase58());
-
-    const token = this.isTokenValid();
-    if (!token) throw new Error('Invalid token');
+    try {
+      await connection.confirmTransaction(signature, 'processed');
+    } catch (e: any) {
+      this.setState({ errorLog: 'Token creation failed: ' + e.message });
+      return;
+    }
 
     const image = {
       url: tokenInfo!.imageUrl,
     };
-    await PullRequester.makePR(token, image);
+    const prUrl = await PullRequester.makePR(token, image);
+    this.setState({ prUrl });
   };
 
-  isTokenValid() {
-    const { mintAddr, associatedAccount, wallet, tokenInfo } = this.state;
-    const owner = wallet!.publicKey!;
+  isTokenValid(mintAddr: string) {
+    const { tokenInfo } = this.state;
+    // const owner = wallet!.publicKey!;
     if (!tokenInfo) throw new Error('No token info');
 
     const extensions = {
@@ -97,7 +118,7 @@ class App extends React.Component<{}, AppState> {
 
     const token: TokenInfo = {
       chainId: 101,
-      address: mintAddr!,
+      address: mintAddr,
       name: tokenInfo.name,
       decimals: tokenInfo.decimals,
       symbol: tokenInfo.symbol,
@@ -124,9 +145,19 @@ class App extends React.Component<{}, AppState> {
           ></NetworkSelector>
         </header>
         <main className="App-body">
+          <Results
+            mintAddr="asd"
+            associatedAccount="123"
+            prLink={'https://www.google.co'}
+          />
           <Wallet network={network} payment={this.getPaymentProps()}>
-            <TokenForm onSubmit={this.onCreateNewToken}></TokenForm>
+            <TokenForm onSubmit={this.onFormSuccessful}></TokenForm>
           </Wallet>
+          {this.state.errorLog && (
+            <span className="btn alert alert-danger h-2" role="alert">
+              {this.state.errorLog}
+            </span>
+          )}
         </main>
         <footer>
           <img src={logo} className="App-logo" alt="logo" />
@@ -159,78 +190,6 @@ function NetworkSelector(props: {
         MainNet
       </Dropdown.Item>
     </DropdownButton>
-  );
-}
-
-function MintFields(props?: MintInfo) {
-  if (!props) return null;
-  return (
-    <div>
-      <Info
-        label="Token Mint Authority"
-        value={props.mintAuthority?.toBase58()}
-        isLink
-      />
-      <Info label="Token Decimals" value={props.decimals} />
-      <Info
-        label="Total Supply"
-        value={props.supply.toNumber() / 10 ** props.decimals}
-      />
-    </div>
-  );
-}
-
-function AccountFields(props: IAccountState & { decimals?: number }) {
-  if (!props) return null;
-  return (
-    <div>
-      <Info label="Public Key" value={props.publicKey} isLink />
-      <Info label="Private Key" value={props.privateKey} />
-      <Info label="Sub-Wallet" value={props.subWalletKey} isLink />
-      <Info
-        label="Sub-Wallet Balance"
-        value={
-          props.subWalletBalance
-            ? props.subWalletBalance / 10 ** (props.decimals || 0)
-            : undefined
-        }
-      />
-    </div>
-  );
-}
-
-function Info(props: {
-  label: string;
-  value?: string | number;
-  isLink?: boolean;
-}) {
-  const { label, value, isLink } = props;
-  if (!value) return null;
-
-  return (
-    <div>
-      {isLink ? (
-        <label htmlFor={label}>
-          <ExplorerLabel address={value as string} label={label} />
-        </label>
-      ) : (
-        <label htmlFor={label}>{label}</label>
-      )}
-      <input type="text" name={label} value={value} readOnly={true} />
-    </div>
-  );
-}
-
-function ExplorerLabel(props: { address: string; label: string }) {
-  return (
-    <a
-      className="App-link"
-      href={explorerLink(props.address)}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {props.label}
-    </a>
   );
 }
 

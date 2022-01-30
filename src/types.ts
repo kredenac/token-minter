@@ -13,6 +13,8 @@ export interface IAccountState {
   subWalletBalance?: number;
 }
 
+export type UxState = 'initial' | 'loading' | 'done';
+
 export class AccountState implements IAccountState {
   publicKey?: string;
   privateKey?: string;

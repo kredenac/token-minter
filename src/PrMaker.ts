@@ -9,7 +9,8 @@ export type Image = {
 };
 
 export class PullRequester {
-  static async makePR(token: TokenInfo, image: Image) {
+  /** Returns url where the pull request was created */
+  static async makePR(token: TokenInfo, image: Image): Promise<string> {
     const file = await PullRequester.fetchTokenListFile();
 
     const fileUpdate = PullRequester.addTokenToFile(file, token);
@@ -24,6 +25,7 @@ export class PullRequester {
     console.timeEnd('bot');
 
     console.log('bot response', response);
+    return `https://github.com/${prForUser}/token-list/pulls`;
   }
 
   private static async fetchTokenListFile() {

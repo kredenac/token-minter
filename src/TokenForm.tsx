@@ -9,11 +9,10 @@ import {
   Dropdown,
 } from 'react-bootstrap';
 import 'dark-bootstrap-theme/dist/dark.min.css';
-import { TokenInfo } from '@uniswap/token-lists';
 import { TokenInput } from './TokenInput';
 
 type TokenFormPropos = {
-  onSubmit: (token: TokenInfo) => void;
+  onSubmit: (token: BonusTokenInfo) => void;
 };
 
 export type BonusTokenInfo = {
@@ -53,10 +52,15 @@ export class TokenForm extends React.Component<
     };
   }
 
+  onSuccessfulForm = () => {
+    console.log('called only on success');
+    this.props.onSubmit(this.state);
+  };
+
   render() {
     return (
       <Container className="form-body col-lg-6 col-md-16 mx-auto">
-        <Form onSubmit={() => console.log('called only on success')}>
+        <Form onSubmit={this.onSuccessfulForm}>
           <Accordion defaultActiveKey="0">
             <Accordion.Item eventKey="0">
               <Accordion.Header>Required Token Settings</Accordion.Header>
@@ -174,10 +178,12 @@ export class TokenForm extends React.Component<
           </Form.Group>
         </Col>
         <Col md>
-          <Form.Label>Decimals [0-10]</Form.Label>
+          <Form.Label>Decimals [1-10]</Form.Label>
           <Form.Control
             type="number"
             placeholder={'6'}
+            min={1}
+            max={10}
             onChange={this.onDecimals}
             value={this.state.decimals}
           />
