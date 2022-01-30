@@ -10,7 +10,6 @@ type FileWrapper = {
 const allowedExtensions = ['svg' /*, 'png', 'jpg'*/];
 const maxImgKbSize = 170 * 1024;
 export function TokenInput() {
-  const [name, setName] = useState('token name');
   const [img, setImg] = useState<File | undefined>();
 
   const getImageFileObject = async (imageFile: FileWrapper) => {
@@ -45,7 +44,6 @@ export function TokenInput() {
 
   return (
     <div>
-      <p>{name}</p>
       <ImageUploader
         onFileAdded={(img: FileWrapper) => getImageFileObject(img)}
         onFileRemoved={(img: FileWrapper) => runAfterImageDelete(img)}

@@ -47,9 +47,9 @@ export async function createMintingTransaction(args: {
     Token.createInitMintInstruction(
       TOKEN_PROGRAM_ID,
       mintKeypair.publicKey,
-      5,
+      5, // TODO variable
       publicKey,
-      null
+      null // TODO variable
     ),
     Token.createAssociatedTokenAccountInstruction(
       ASSOCIATED_TOKEN_PROGRAM_ID,

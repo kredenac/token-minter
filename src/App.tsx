@@ -31,8 +31,6 @@ function App() {
     <div className="App">
       <header className="App-header">
         <Wallet></Wallet>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>🚀StreamFlow Token Minter🚀</p>
         <div>
           <StepProgressBar
             currentStep={state.currentSteps}
@@ -45,6 +43,8 @@ function App() {
         <TokenInput></TokenInput>
         <TokenForm></TokenForm>
       </header>
+      <img src={logo} className="App-logo" alt="logo" />
+      <p>🚀StreamFlow Token Minter🚀</p>
     </div>
   );
 }
