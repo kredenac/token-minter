@@ -48,7 +48,7 @@ export class TokenForm extends React.Component<
             </Accordion.Item>
           </Accordion>
           <button type="submit" className="btn btn-primary">
-            Create Your Token
+            Create Your New Token!
           </button>
         </Form>
       </Container>
@@ -109,7 +109,7 @@ export class TokenForm extends React.Component<
       <Row>
         <Col md>
           <Form.Group>
-            <Form.Label>Tags - Comma Separated Words</Form.Label>
+            <Form.Label>Tags - Comma Separated</Form.Label>
             <Form.Control
               type="text"
               placeholder="tokenized-stock, DeFi"

@@ -3,10 +3,10 @@
 }
 
 .App-logo {
-  height: 10vmin;
+  height: 40px;
   pointer-events: none;
-  padding-top: 30px;
-  padding-bottom: 30px;
+  padding-top: 10px;
+  padding-bottom: 5px;
 }
 
 body {
@@ -14,11 +14,11 @@ body {
     sans-serif;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
+/* @media (prefers-reduced-motion: no-preference) { */
+  /* .App-logo { */
     /* animation: App-logo-spin infinite 2s cubic-bezier(.75,-0.01,.25,.98); */
-  }
-}
+  /* } */
+/* } */
 
 .output {
   width: 250px;
@@ -30,17 +30,10 @@ p {
   opacity: 0.5;
 }
 
-.just-do-it {
-  background-color: #062 !important;
-}
-
-.just-do-it:hover {
-  background-color: rgb(14, 153, 60) !important; 
-}
-
-.App-header {
+.App-body {
   background-color: #1a1d24;
-  min-height: 100vh;
+  min-height: 90vh;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,7 +46,7 @@ p {
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
+/* @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
   }
@@ -63,7 +56,7 @@ p {
   to {
     transform: rotate(0deg);
   }
-}
+} */
 
 button {
   font-size: calc(10px + 2vmin);

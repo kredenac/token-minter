@@ -12,9 +12,6 @@ import { MintInfo } from '@solana/spl-token';
 import { StepProgressBar } from './ProgressSteps';
 import { Wallet } from './walletAdapter';
 
-import { TokenInput } from './TokenInput';
-import { TokenForm } from './TokenForm';
-
 const reducer = (state: AppState, update: SetStateParam): AppState => {
   // support both object updates and update through callback
   let newState = update;
@@ -29,7 +26,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      <main className="App-body">
         <Wallet></Wallet>
         <div>
           <StepProgressBar
@@ -40,10 +37,12 @@ function App() {
             Start minting!
           </button> */}
         </div>
-        <TokenForm></TokenForm>
-      </header>
-      <img src={logo} className="App-logo" alt="logo" />
-      <p>🚀StreamFlow Token Minter🚀</p>
+        {/* <TokenForm onSumbmit={() => console.log('top submit')}></TokenForm> */}
+      </main>
+      <footer>
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>🚀StreamFlow Token Minter🚀</p>
+      </footer>
     </div>
   );
 }
