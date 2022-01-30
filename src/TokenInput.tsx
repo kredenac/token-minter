@@ -43,13 +43,10 @@ export function TokenInput() {
   }, [img]);
 
   return (
-    <div>
-      <ImageUploader
-        onFileAdded={(img: FileWrapper) => getImageFileObject(img)}
-        onFileRemoved={(img: FileWrapper) => runAfterImageDelete(img)}
-      />
-      <button onClick={onClick}>Submit Token</button>
-    </div>
+    <ImageUploader
+      onFileAdded={(img: FileWrapper) => getImageFileObject(img)}
+      onFileRemoved={(img: FileWrapper) => runAfterImageDelete(img)}
+    />
   );
 }
 

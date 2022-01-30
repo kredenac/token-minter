@@ -40,7 +40,6 @@ function App() {
             Start minting!
           </button> */}
         </div>
-        <TokenInput></TokenInput>
         <TokenForm></TokenForm>
       </header>
       <img src={logo} className="App-logo" alt="logo" />
