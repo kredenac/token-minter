@@ -46,6 +46,7 @@ export default defineConfig({
     domain: 'rollup-plugin-node-polyfills/polyfills/domain',
     process: 'rollup-plugin-node-polyfills/polyfills/process-es6',
     invariant: `${__dirname}/src/invariant`,
+    buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
   },
   optimizeDeps: {
     esbuildOptions: {

@@ -149,6 +149,11 @@ class App extends React.Component<{}, AppState> {
       return <ErrorReport error={this.state.errorLog} />;
     }
 
+    let form = <TokenForm onSubmit={this.onFormSuccessful} />;
+    if (this.state.uxState !== 'initial') {
+      form = <div style={{ display: 'none' }}>{form}</div>;
+    }
+
     const { network } = this.state;
     return (
       <div className="App">
@@ -166,18 +171,21 @@ class App extends React.Component<{}, AppState> {
             uxState={this.state.uxState}
           />
           <Wallet network={network} payment={this.getPaymentProps()}>
-            <div
-              style={{
-                display: this.state.uxState === 'loading' ? 'none' : 'auto',
-              }}
-            >
-              <TokenForm onSubmit={this.onFormSuccessful} />
-            </div>
+            {form}
           </Wallet>
         </main>
         <footer>
           <img src={logo} className="App-logo" alt="logo" />
-          <p>🚀StreamFlow Token Minter🚀</p>
+          <p>
+            <a
+              href="https://streamflow.finance/"
+              style={{ all: 'unset', cursor: 'pointer' }}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🚀StreamFlow Token Minter🚀
+            </a>
+          </p>
         </footer>
       </div>
     );
@@ -187,12 +195,14 @@ class App extends React.Component<{}, AppState> {
 function ErrorReport(props: { error?: string }) {
   if (!props.error) return null;
   return (
-    <div>
-      <p className="btn alert alert-danger h-2" role="alert">
-        {'An error occurred: ' + props.error}
-      </p>
-      <br />
-      <Button onClick={() => window.location.reload()}>Try again</Button>
+    <div style={{ marginTop: '100px' }}>
+      <div style={{ margin: 'auto', width: '600px', padding: '50px' }}>
+        <p className="btn alert alert-danger h-2" role="alert">
+          {'An error occurred: ' + props.error}
+        </p>
+        <br />
+        <Button onClick={() => window.location.reload()}>Try again</Button>
+      </div>
     </div>
   );
 }

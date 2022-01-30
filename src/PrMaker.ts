@@ -36,9 +36,20 @@ export class PullRequester {
   }
 
   private static addTokenToFile(file: string, token: TokenInfo): string {
-    const lines = file.split('\n');
+    // Order of properties is important for auto-merger
+    const orderedToken: TokenInfo = {
+      chainId: token.chainId,
+      address: token.address,
+      symbol: token.symbol,
+      name: token.name,
+      decimals: token.decimals,
+      logoURI: token.logoURI,
+      tags: token.tags,
+      extensions: token.extensions,
+    };
 
-    const newLines = JSON.stringify(token, null, 2)
+    const lines = file.split('\n');
+    const newLines = JSON.stringify(orderedToken, null, 2)
       .split('\n')
       .map((line) => '    ' + line);
 
@@ -49,7 +60,7 @@ export class PullRequester {
     return lines.join('\n');
   }
 
-  /** Lasts around 14 seconds, need to show spinner */
+  /** Lasts around 14 seconds */
   private static async makePullRequest(
     tokenList: string,
     image: Image,

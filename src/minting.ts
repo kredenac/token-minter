@@ -1,11 +1,6 @@
 import * as web3 from '@solana/web3.js';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import { mnemonicToSeedSync } from 'bip39';
-import {
-  createToken,
-  mintNewCoinsOnToken,
-  updateMintAndAccountInfo,
-} from './genesis';
 import keys from '../devnetkeys.json';
 import bs58 from 'bs58';
 import { AccountState, environment, TransactionPair } from './types';
@@ -22,13 +17,13 @@ export async function startMinting() {
     'confirmed'
   );
 
-  const pair = getFromAndTo();
+  // const pair = getFromAndTo();
 
-  const newToken = await createToken(connection, pair);
+  // const newToken = await createToken(connection, pair);
 
-  await mintNewCoinsOnToken(connection, newToken.publicKey, pair.from, pair.to);
+  // await mintNewCoinsOnToken(connection, newToken.publicKey, pair.from, pair.to);
 
-  await updateMintAndAccountInfo(newToken, pair.from.publicKey);
+  // await updateMintAndAccountInfo(newToken, pair.from.publicKey);
 }
 
 export function getFromAndTo(): TransactionPair {
