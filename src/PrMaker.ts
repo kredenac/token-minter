@@ -60,6 +60,15 @@ export class PullRequester {
     return lines.join('\n');
   }
 
+  public static getUploadedImagePath(tokenAddr: string) {
+    const path = PullRequester.getImgPath(tokenAddr);
+    return `https://raw.githubusercontent.com/solana-labs/token-list/main/${path}`;
+  }
+
+  private static getImgPath(tokenAddr: string) {
+    return `assets/mainnet/${tokenAddr}/logo.svg`;
+  }
+
   /** Lasts around 14 seconds */
   private static async makePullRequest(
     tokenList: string,
@@ -76,7 +85,7 @@ export class PullRequester {
     // If image url is given, no need to upload anything for the image
     if (image.content) {
       files.push({
-        path: `assets/mainnet/${token.address}/logo.${image.ext}`,
+        path: PullRequester.getImgPath(token.address),
         content: image.content,
       });
     }

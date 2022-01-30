@@ -113,6 +113,8 @@ class App extends React.Component<{}, AppState> {
 
     const image = {
       url: tokenInfo!.imageUrl,
+      ext: 'svg',
+      content: tokenInfo.imageFile,
     };
     // TODO have some timeout
     const prUrl = await PullRequester.makePR(token, image);
@@ -130,13 +132,14 @@ class App extends React.Component<{}, AppState> {
 
     const tags = tokenInfo.tags.length ? tokenInfo.tags : undefined;
 
+    const imageUploadPath = PullRequester.getUploadedImagePath(mintAddr);
     const token: TokenInfo = {
       chainId: 101,
       address: mintAddr,
       name: tokenInfo.name,
       decimals: tokenInfo.decimals,
       symbol: tokenInfo.symbol,
-      logoURI: tokenInfo.imageUrl, // TODO construct url for uploaded file
+      logoURI: tokenInfo.imageFile ? imageUploadPath : tokenInfo.imageUrl,
       extensions,
       tags,
     };

@@ -74,12 +74,9 @@ function InfoLink(props: { label: string; value?: string | number }) {
 
   return (
     <div>
-      {
-        <Form.Label htmlFor={label}>
-          <ExplorerLabel address={value as string} label={label} />
-        </Form.Label>
-      }
-      {/* <Form.Control type="text" name={label} value={value} readOnly={true} /> */}
+      <Form.Label htmlFor={label}>
+        <ExplorerLabel address={value as string} label={label} />
+      </Form.Label>
     </div>
   );
 }

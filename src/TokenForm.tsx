@@ -98,8 +98,11 @@ export class TokenForm extends React.Component<
     this.setState({ twitter: e.target.value });
   onSupply = (e: React.ChangeEvent<HTMLInputElement>) =>
     Number(e.target.value) && this.setState({ supply: Number(e.target.value) });
+  /** For img via link */
   onimageUrl = (e: React.ChangeEvent<HTMLInputElement>) =>
     this.setState({ imageUrl: e.target.value });
+  /** For img via upload */
+  onimageContent = (content: string) => this.setState({ imageFile: content });
   ontag = (e: React.ChangeEvent<HTMLInputElement>) =>
     this.setState({ tags: e.target.value.split(',').map((tag) => tag.trim()) });
   getTagValue() {
@@ -195,14 +198,14 @@ export class TokenForm extends React.Component<
             title={
               this.state.showImgUpload
                 ? 'Select Token Icon Via Image Upload'
-                : 'Select Token Icon Via ULR'
+                : 'Select Token Icon Via URL'
             }
             className="mt-2"
           >
             <Dropdown.Item
               onClick={() => this.setState({ showImgUpload: false })}
             >
-              Select Token Icon Via ULR
+              Select Token Icon Via URL
             </Dropdown.Item>
             <Dropdown.Item
               onClick={() => this.setState({ showImgUpload: true })}
@@ -239,7 +242,6 @@ export class TokenForm extends React.Component<
         />
       );
     }
-    // TODO revive this
-    return <TokenInput></TokenInput>;
+    return <TokenInput setImage={this.onimageContent}></TokenInput>;
   }
 }
