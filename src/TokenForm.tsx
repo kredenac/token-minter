@@ -7,7 +7,6 @@ import {
   Container,
   DropdownButton,
   Dropdown,
-  Tooltip,
 } from 'react-bootstrap';
 import 'dark-bootstrap-theme/dist/dark.min.css';
 import { TokenInfo } from '@uniswap/token-lists';
@@ -17,22 +16,37 @@ type TokenFormPropos = {
   onSumbmit: (token: TokenInfo) => void;
 };
 
-export class TokenForm extends React.Component<TokenFormPropos, TokenInfo> {
+interface TokenFormState extends TokenInfo {
+  showImgUpload: boolean;
+}
+
+export class TokenForm extends React.Component<
+  TokenFormPropos,
+  TokenFormState
+> {
+  constructor(props: TokenFormPropos) {
+    super(props);
+    this.state = { showImgUpload: false } as any;
+  }
+
+  // accordionRef = React.createRef<typeofAccordion>();
+
   render() {
     return (
       <Container className="form-body col-lg-6 col-md-16 mx-auto">
-        <Form>
-          <Accordion defaultActiveKey="1">
+        <Form action={'#'} onSubmit={() => console.log('form.onsubmit')}>
+          <Accordion defaultActiveKey="0">
             <Accordion.Item eventKey="0">
               <Accordion.Header>Required Token Settings</Accordion.Header>
               <Accordion.Body> {this.basic()}</Accordion.Body>
             </Accordion.Item>
+          </Accordion>
+          <Accordion>
             <Accordion.Item eventKey="1">
               <Accordion.Header>Advanced Token Settings</Accordion.Header>
               <Accordion.Body>{this.advanced()}</Accordion.Body>
             </Accordion.Item>
           </Accordion>
-          <Row className="d-none"></Row>
           <button type="submit" className="btn btn-primary">
             Create Your Token
           </button>
@@ -47,7 +61,12 @@ export class TokenForm extends React.Component<TokenFormPropos, TokenInfo> {
         <Col md>
           <Form.Group>
             <Form.Label>Token Symbol</Form.Label>
-            <Form.Control type="text" placeholder="SOL" maxLength={21} />
+            <Form.Control
+              type="text"
+              placeholder="SOL"
+              maxLength={21}
+              required
+            />
           </Form.Group>
         </Col>
         <Col md>
@@ -56,6 +75,7 @@ export class TokenForm extends React.Component<TokenFormPropos, TokenInfo> {
             type="text"
             placeholder={'Solana Token'}
             maxLength={56}
+            required
           />
         </Col>
       </Row>
@@ -63,7 +83,11 @@ export class TokenForm extends React.Component<TokenFormPropos, TokenInfo> {
         <Col md>
           <Form.Group>
             <Form.Label>Token Supply</Form.Label>
-            <Form.Control type="number" placeholder="1000" />
+            <Form.Control
+              type="number"
+              placeholder="1000"
+              defaultValue={1000000}
+            />
           </Form.Group>
         </Col>
         <Col md>
@@ -100,22 +124,26 @@ export class TokenForm extends React.Component<TokenFormPropos, TokenInfo> {
       </Row>
       <Row>
         <Col md>
-          <DropdownButton title="Select Token Icon Via ULR" className="mt-2">
-            <Dropdown.Item>Select Token Icon Via ULR</Dropdown.Item>
-            <Dropdown.Item>Select Token Icon Via Image Upload</Dropdown.Item>
-          </DropdownButton>
-
-          <Form.Control
-            type="url"
-            pattern="https://.*"
-            placeholder={'https://website.com/logo.svg'}
-            defaultValue={
-              'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png'
+          <DropdownButton
+            title={
+              this.state.showImgUpload
+                ? 'Select Token Icon Via Image Upload'
+                : 'Select Token Icon Via ULR'
             }
-            maxLength={56}
-          />
-
-          <TokenInput></TokenInput>
+            className="mt-2"
+          >
+            <Dropdown.Item
+              onClick={() => this.setState({ showImgUpload: false })}
+            >
+              Select Token Icon Via ULR
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={() => this.setState({ showImgUpload: true })}
+            >
+              Select Token Icon Via Image Upload
+            </Dropdown.Item>
+          </DropdownButton>
+          {this.imageInput()}
         </Col>
         <Col md>
           <Form.Label className="mt-3">Twitter Profile</Form.Label>
@@ -128,4 +156,21 @@ export class TokenForm extends React.Component<TokenFormPropos, TokenInfo> {
       </Row>
     </>
   );
+
+  imageInput() {
+    if (!this.state.showImgUpload) {
+      return (
+        <Form.Control
+          type="url"
+          pattern="https://.*"
+          placeholder={'https://website.com/logo.svg'}
+          defaultValue={
+            'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png'
+          }
+          maxLength={56}
+        />
+      );
+    }
+    return <TokenInput></TokenInput>;
+  }
 }
