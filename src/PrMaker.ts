@@ -96,16 +96,15 @@ export class PullRequester {
           body: JSON.stringify({
             user: prForUser,
             repo: 'token-list',
-            description: `Adding ${token.name} token on behalf of https://www.google.com`,
+            description: `Adding ${token.name} (${token.symbol}) token on behalf of ${window.location.host}`,
             title: `Listing ${token.symbol}`,
-            commit: `Adding ${token.name} token on behalf of https://www.google.com`,
+            commit: `Adding ${token.name} (${token.symbol}) token`,
             files,
           }),
         }
       );
     } catch (error: unknown) {
-      console.log('pr bot error');
-      console.log(error);
+      console.log('PR bot error', error);
     }
   }
 }

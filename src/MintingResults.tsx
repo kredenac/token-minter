@@ -46,7 +46,7 @@ function Congrats() {
   return (
     <div
       className="alert alert-success mx-auto"
-      style={{ maxWidth: '490px' }}
+      style={{ maxWidth: '500px' }}
       role="alert"
     >
       🎉🔥You minted a new token!🔥🎉 <br />
