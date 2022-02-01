@@ -9,13 +9,13 @@ import {
 import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import { WalletContextState } from '@solana/wallet-adapter-react';
 import { Connection } from '@solana/web3.js';
-import { createMintingTransaction } from './genesis';
-import { defineTokenForListing } from './github';
+import { createMintingTransaction } from './mintInstruction';
+import { defineTokenForListing } from './tokenValidator';
 import { TokenInfo } from '@uniswap/token-lists';
 import { BonusTokenInfo, TokenForm } from './TokenForm';
 import { PullRequester } from './PrMaker';
-import { Results } from './Results';
-import { UxState } from './types';
+import { MintingResults } from './MintingResults';
+import { UxState } from './utils';
 
 export type AppState = {
   tokenPubKey?: string;
@@ -40,6 +40,7 @@ class App extends React.Component<{}, AppState> {
   }
 
   setMintAddress = (mint: string) => this.setState({ mintAddr: mint });
+
   setAssociatedAddress = (associatedAccount: string) =>
     this.setState({ associatedAccount });
 
@@ -116,7 +117,7 @@ class App extends React.Component<{}, AppState> {
       ext: 'svg',
       content: tokenInfo.imageFile,
     };
-    // TODO have some timeout
+    // Should add a timeout here, as the request is opaque and we can't catch errors
     const prUrl = await PullRequester.makePR(token, image);
     this.setState({ prUrl, uxState: 'done' });
   };
@@ -167,7 +168,7 @@ class App extends React.Component<{}, AppState> {
           ></NetworkSelector>
         </header>
         <main className="App-body">
-          <Results
+          <MintingResults
             mintAddr={this.state.mintAddr}
             associatedAccount={this.state.associatedAccount}
             prLink={this.state.prUrl}

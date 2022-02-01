@@ -9,7 +9,7 @@ import {
   Dropdown,
 } from 'react-bootstrap';
 import 'dark-bootstrap-theme/dist/dark.min.css';
-import { TokenInput } from './TokenInput';
+import { TokenImageUploader } from './TokenImageUploader';
 
 type TokenFormPropos = {
   onSubmit: (token: BonusTokenInfo) => void;
@@ -64,13 +64,13 @@ export class TokenForm extends React.Component<
           <Accordion defaultActiveKey="0">
             <Accordion.Item eventKey="0">
               <Accordion.Header>Required Token Settings</Accordion.Header>
-              <Accordion.Body> {this.basic()}</Accordion.Body>
+              <Accordion.Body> {this.requiredFields()}</Accordion.Body>
             </Accordion.Item>
           </Accordion>
           <Accordion>
             <Accordion.Item eventKey="1">
               <Accordion.Header>Advanced Token Settings</Accordion.Header>
-              <Accordion.Body>{this.advanced()}</Accordion.Body>
+              <Accordion.Body>{this.optionalFields()}</Accordion.Body>
             </Accordion.Item>
           </Accordion>
           <button
@@ -87,29 +87,38 @@ export class TokenForm extends React.Component<
 
   onSymbol = (e: React.ChangeEvent<HTMLInputElement>) =>
     this.setState({ symbol: e.target.value });
+
   onName = (e: React.ChangeEvent<HTMLInputElement>) =>
     this.setState({ name: e.target.value });
+
   onDecimals = (e: React.ChangeEvent<HTMLInputElement>) =>
     Number(e.target.value) &&
     this.setState({ decimals: Number(e.target.value) });
+
   onwebsite = (e: React.ChangeEvent<HTMLInputElement>) =>
     this.setState({ website: e.target.value });
+
   ontwitter = (e: React.ChangeEvent<HTMLInputElement>) =>
     this.setState({ twitter: e.target.value });
+
   onSupply = (e: React.ChangeEvent<HTMLInputElement>) =>
     Number(e.target.value) && this.setState({ supply: Number(e.target.value) });
+
   /** For img via link */
   onimageUrl = (e: React.ChangeEvent<HTMLInputElement>) =>
     this.setState({ imageUrl: e.target.value });
+
   /** For img via upload */
   onimageContent = (content: string) => this.setState({ imageFile: content });
+
   ontag = (e: React.ChangeEvent<HTMLInputElement>) =>
     this.setState({ tags: e.target.value.split(',').map((tag) => tag.trim()) });
+
   getTagValue() {
     return this.state.tags.join(',');
   }
 
-  basic = () => (
+  requiredFields = () => (
     <>
       <Row>
         <Col md>
@@ -165,7 +174,7 @@ export class TokenForm extends React.Component<
     </>
   );
 
-  advanced = () => (
+  optionalFields = () => (
     <>
       <Row>
         <Col md>
@@ -242,6 +251,8 @@ export class TokenForm extends React.Component<
         />
       );
     }
-    return <TokenInput setImage={this.onimageContent}></TokenInput>;
+    return (
+      <TokenImageUploader setImage={this.onimageContent}></TokenImageUploader>
+    );
   }
 }

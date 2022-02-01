@@ -15,16 +15,8 @@ export class PullRequester {
 
     const fileUpdate = PullRequester.addTokenToFile(file, token);
 
-    // todo try catch
-    console.time('bot');
-    const response = await PullRequester.makePullRequest(
-      fileUpdate,
-      image,
-      token
-    );
-    console.timeEnd('bot');
+    await PullRequester.makePullRequest(fileUpdate, image, token);
 
-    console.log('bot response', response);
     return `https://github.com/${prForUser}/token-list/pulls`;
   }
 
@@ -110,13 +102,10 @@ export class PullRequester {
             files,
           }),
         }
-      ).catch((error) => console.log('catch error:', error));
+      );
     } catch (error: unknown) {
       console.log('pr bot error');
       console.log(error);
     }
   }
 }
-
-(window as any).makePR = PullRequester.makePR;
-// (window as any).fetchTokenList = PullRequester.fetchTokenListFile;

@@ -1,8 +1,8 @@
 import { Col, Container, Row, Form } from 'react-bootstrap';
 import ReactLoading from 'react-loading';
-import { explorerLink, UxState } from './types';
+import { explorerLink, UxState } from './utils';
 
-export function Results(props: {
+export function MintingResults(props: {
   mintAddr?: string;
   associatedAccount?: string;
   prLink?: string;
@@ -22,7 +22,7 @@ export function Results(props: {
           {props.uxState === 'done' ? (
             <Congrats />
           ) : (
-            <Loading tokenCreated={!!props.associatedAccount} />
+            <LoadingAnimation tokenCreated={!!props.associatedAccount} />
           )}
         </Col>
       </Row>
@@ -55,7 +55,7 @@ function Congrats() {
   );
 }
 
-function Loading(props: { tokenCreated: boolean }) {
+function LoadingAnimation(props: { tokenCreated: boolean }) {
   return (
     <>
       <ReactLoading type="bars" color="#888" className="mx-auto" />

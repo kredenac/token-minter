@@ -3,13 +3,12 @@ import { TokenList, TokenInfo } from '@uniswap/token-lists';
 
 /** Returns error string if failed */
 export function defineTokenForListing(
-  token: Partial<TokenInfo>
+  token: Omit<TokenInfo, 'chainId'>
 ): TokenInfo | string {
   const tokenList: TokenList = response;
 
-  token = { chainId: 101, ...token };
+  const newToken: TokenInfo = { chainId: 101, ...token };
 
-  const newToken = createTokenForListing(token);
   const hasError = validateToken(tokenList, newToken);
   if (hasError) return hasError;
 
@@ -42,11 +41,4 @@ function validateToken(
   if (same) {
     return 'Token with same address, name or symbol already exists';
   }
-}
-
-function createTokenForListing(token: Partial<TokenInfo>): TokenInfo {
-  return {
-    chainId: 101,
-    ...token,
-  } as TokenInfo;
 }

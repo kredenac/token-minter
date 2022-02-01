@@ -1,5 +1,4 @@
 import ImageUploader from 'react-image-upload';
-import 'react-image-upload/dist/index.css';
 
 type FileWrapper = {
   file: File;
@@ -7,7 +6,10 @@ type FileWrapper = {
 
 const allowedExtensions = ['svg' /*, 'png', 'jpg'*/];
 const maxImgKbSize = 170 * 1024;
-export function TokenInput(props: { setImage: (content: string) => void }) {
+
+export function TokenImageUploader(props: {
+  setImage: (content: string) => void;
+}) {
   const getImageFileObject = async (imageFile: FileWrapper) => {
     const img = imageFile.file;
     if (!img) return;
@@ -35,17 +37,17 @@ export function TokenInput(props: { setImage: (content: string) => void }) {
   );
 }
 
-// function arrayBufferToBase64(buffer: ArrayBuffer) {
-//   var binary = '';
-//   var bytes = new Uint8Array(buffer);
-//   var len = bytes.byteLength;
-//   // TODO  O(n^2) :(
-//   for (var i = 0; i < len; i++) {
-//     binary += String.fromCharCode(bytes[i]);
-//   }
-//   console.log('before', binary);
-//   (window as any).binary = binary;
-//   // const after = window.btoa(binary);
-//   // console.log('after', after);
-//   return binary;
-// }
+function arrayBufferToBase64(buffer: ArrayBuffer) {
+  var binary = '';
+  var bytes = new Uint8Array(buffer);
+  var len = bytes.byteLength;
+  // TODO  O(n^2) :(
+  for (var i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  console.log('before', binary);
+  (window as any).binary = binary;
+  // const after = window.btoa(binary);
+  // console.log('after', after);
+  return binary;
+}
